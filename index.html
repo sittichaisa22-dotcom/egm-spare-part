@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EGM Spare Part System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1724;font-family:'Segoe UI',sans-serif;color:#f1f5f9}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:210px;background:#151f2e;border-right:1px solid #1e2d42;display:flex;flex-direction:column;flex-shrink:0}
+.sb-brand{padding:16px;border-bottom:1px solid #1e2d42;font-size:.82rem;font-weight:700;color:#2563eb}
+.sb-brand span{color:#64748b;font-weight:400;font-size:.7rem;display:block;margin-top:2px}
+.sb-sec{font-size:.62rem;font-weight:700;letter-spacing:.1em;color:#475569;padding:14px 14px 4px;text-transform:uppercase}
+.sb-link{display:flex;align-items:center;gap:8px;padding:8px 14px;color:#94a3b8;font-size:.78rem;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.sb-link:hover{color:#f1f5f9;background:#1e2d42}
+.sb-link.active{color:#f1f5f9;background:rgba(37,99,235,.15);border-left-color:#2563eb}
+.sb-link i{font-size:.9rem;width:16px;text-align:center}
+.sb-badge{margin-left:auto;background:#dc2626;color:#fff;border-radius:8px;padding:1px 6px;font-size:.62rem;font-weight:700}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:48px;background:#151f2e;border-bottom:1px solid #1e2d42;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.topbar .title{font-size:.88rem;font-weight:700;color:#f1f5f9;flex:1}
+.user-pill{display:flex;align-items:center;gap:6px;background:#1e2d42;border-radius:16px;padding:4px 12px;font-size:.72rem;color:#94a3b8}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+.page{flex:1;overflow-y:auto;padding:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;padding:12px 14px}
+.stat.blue{border-top:3px solid #2563eb}.stat.red{border-top:3px solid #dc2626}.stat.amber{border-top:3px solid #d97706}.stat.green{border-top:3px solid #16a34a}
+.stat-lbl{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.stat-val{font-size:1.6rem;font-weight:800;line-height:1}
+.stat.blue .stat-val{color:#60a5fa}.stat.red .stat-val{color:#f87171}.stat.amber .stat-val{color:#fbbf24}.stat.green .stat-val{color:#4ade80}
+.card{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;overflow:hidden;margin-bottom:12px}
+.card-hd{background:#1e2d42;padding:8px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:flex;align-items:center;gap:6px}
+table.t{width:100%;border-collapse:collapse;font-size:.74rem}
+table.t th{padding:6px 10px;color:#475569;font-size:.62rem;text-transform:uppercase;border-bottom:1px solid #1e2d42;text-align:left}
+table.t td{padding:7px 10px;border-bottom:1px solid #1e2d42;color:#cbd5e1}
+table.t tr:last-child td{border-bottom:none}
+table.t tr:hover td{background:rgba(255,255,255,.03)}
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:.62rem;font-weight:700}
+.bW{background:rgba(220,38,38,.15);color:#f87171}.bR{background:rgba(22,163,74,.15);color:#4ade80}
+.bA{background:rgba(14,165,233,.15);color:#38bdf8}.bP{background:rgba(217,119,6,.2);color:#fbbf24}
+.pform{padding:12px}
+.flabel{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:block}
+.finput{width:100%;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;color:#f1f5f9;padding:7px 10px;font-size:.78rem;outline:none;margin-bottom:10px}
+.finput:focus{border-color:#2563eb}
+.btn{width:100%;border:none;border-radius:6px;padding:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:#fff;margin-bottom:6px}
+.btn-blue{background:#2563eb}.btn-green{background:#16a34a}.btn-red{background:#dc2626}
+.preview-box{background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:10px 12px;font-size:.75rem;margin-bottom:10px}
+.preview-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1a2535}
+.preview-row:last-child{border:none}
+.pl{color:#64748b}.pv{color:#f1f5f9;font-weight:600}
+.toast{border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;display:none;align-items:center;gap:6px}
+.toast.success{background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);color:#4ade80}
+.toast.error{background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);color:#f87171}
+.loading{text-align:center;padding:40px;color:#475569;font-size:.85rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bar-wrap{height:3px;background:#1e2d42;border-radius:2px;margin-top:3px;width:50px}
+.bar-fill{height:100%;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-brand"><i class="ti ti-packages"></i> EGM Spare Part<span>Inventory System v2.0</span></div>
+    <div class="sb-sec">ภาพรวม</div>
+    <div class="sb-link active" onclick="nav('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="sb-sec">จัดการ Stock</div>
+    <div class="sb-link" onclick="nav('parts',this)"><i class="ti ti-box"></i>รายการอะไหล่</div>
+    <div class="sb-link" onclick="nav('withdraw',this)"><i class="ti ti-arrow-up-circle"></i>เบิกอะไหล่</div>
+    <div class="sb-link" onclick="nav('receive',this)"><i class="ti ti-arrow-down-circle"></i>รับอะไหล่เข้า</div>
+    <div class="sb-sec">รายงาน</div>
+    <div class="sb-link" onclick="nav('log',this)"><i class="ti ti-history"></i>ประวัติ Stock</div>
+    <div class="sb-link" onclick="nav('alerts',this)"><i class="ti ti-bell"></i>Reorder Alerts<span class="sb-badge" id="alertBadge"></span></div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="title" id="pageTitle"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="user-pill"><span class="dot"></span>EGM Admin</div>
+    </div>
+    <div class="page" id="pageContent"><div class="loading">กำลังเชื่อมต่อ Firebase...</div></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBYPu_pV-KmuVo4otitNWoeIWyhD0sMuMo",authDomain:"egm-spare-part-system.firebaseapp.com",projectId:"egm-spare-part-system",storageBucket:"egm-spare-part-system.appspot.com",messagingSenderId:"796709157808",appId:"1:796709157808:web:1c4823af1259046b5b4b35"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+let parts=[],logs=[],alerts=[];
+
+function pct(q,max){return Math.min(100,Math.round(q/max*100))}
+function sc(q,min){return q===0?'#dc2626':q<=min?'#f87171':'#4ade80'}
+function ba(a){const m={WITHDRAW:'bW',RECEIVE:'bR',ADJUST:'bA'};return '<span class="badge '+(m[a]||'bA')+'">'+a+'</span>'}
+function ft(ts){try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('th-TH')+' '+d.toTimeString().slice(0,5)}catch(e){return '—'}}
+
+async function loadParts(){const s=await db.collection('parts').get();parts=s.docs.map(d=>({id:d.id,...d.data()}))}
+async function loadLogs(){const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}
+async function loadAlerts(){
+  const s=await db.collection('alerts').get();
+  alerts=s.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.status==='PENDING'||a.status==='ORDERED');
+  const cnt=alerts.filter(a=>a.status==='PENDING').length;
+  document.getElementById('alertBadge').textContent=cnt||'';
+}
+async function loadAll(){await Promise.all([loadParts(),loadLogs(),loadAlerts()])}
+
+async function seedIfEmpty(){
+  const s=await db.collection('parts').limit(1).get();
+  if(!s.empty)return;
+  const d=[{pn:'EL-001',name:'Contactor 3P 220V',cat:'Electric',qty:8,min:5,max:20,loc:'A-01'},{pn:'EL-002',name:'Circuit Breaker 32A',cat:'Electric',qty:3,min:5,max:15,loc:'A-02'},{pn:'ME-001',name:'Bearing 6205',cat:'Mechanical',qty:12,min:5,max:30,loc:'B-01'},{pn:'ME-002',name:'V-Belt A-40',cat:'Mechanical',qty:2,min:5,max:20,loc:'B-02'},{pn:'EL-003',name:'Proximity Sensor 24V',cat:'Electric',qty:15,min:5,max:25,loc:'A-03'}];
+  for(const p of d)await db.collection('parts').add(p);
+}
+
+window.nav=async function(page,el){
+  document.querySelectorAll('.sb-link').forEach(x=>x.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('pageContent').innerHTML='<div class="loading">กำลังโหลด...</div>';
+  await loadAll();
+  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts'}[page]||page;
+  document.getElementById('pageContent').innerHTML={dashboard:rDash,parts:rParts,withdraw:rWith,receive:rRec,log:rLog,alerts:rAlerts}[page]();
+}
+
+function rDash(){
+  const t=parts.length,low=parts.filter(p=>p.qty<=p.min).length,out=parts.filter(p=>p.qty===0).length,ok=parts.filter(p=>p.qty>p.min).length;
+  const ah=low>0?'<div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);color:#f87171;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle"></i> มีอะไหล่ '+low+' รายการที่ Stock ต่ำกว่า Min</div>':'';
+  const pr=parts.slice(0,6).map(p=>'<tr><td style="color:#64748b;font-size:.68rem">'+p.pn+'</td><td style="color:#f1f5f9">'+p.name+'</td><td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำ':'OK')+'</span></td><td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td><td><div class="bar-wrap"><div class="bar-fill" style="width:'+pct(p.qty,p.max)+'%;background:'+sc(p.qty,p.min)+'"></div></div></td></tr>').join('');
+  const lr=logs.slice(0,5).map(l=>'<tr><td style="color:#475569;font-size:.65rem">'+ft(l.time)+'</td><td style="color:#f1f5f9">'+(l.partName||'—')+'</td><td style="color:#94a3b8">'+(l.user||'—')+'</td><td>'+ba(l.action)+'</td><td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td><td style="color:#f1f5f9">'+l.after+'</td></tr>').join('');
+  return ah+'<div class="stat-grid"><div class="stat blue"><div class="stat-lbl">Part ทั้งหมด</div><div class="stat-val">'+t+'</div></div><div class="stat green"><div class="stat-lbl">Stock ปกติ</div><div class="stat-val">'+ok+'</div></div><div class="stat amber"><div class="stat-lbl">Stock ต่ำ</div><div class="stat-val">'+low+'</div></div><div class="stat red"><div class="stat-lbl">หมด Stock</div><div class="stat-val">'+out+'</div></div></div><div class="row2"><div class="card"><div class="card-hd"><i class="ti ti-box"></i> Stock Overview</div><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ</th><th>สถานะ</th><th>Qty</th><th>Level</th></tr></thead><tbody>'+pr+'</tbody></table></div><div class="card"><div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th></tr></thead><tbody>'+(lr||'<tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
+}
+
+function rParts(){
+  const r=parts.map(p=>'<tr><td style="color:#64748b;font-size:.68rem">'+p.pn+'</td><td style="color:#f1f5f9;font-weight:600">'+p.name+'</td><td><span class="badge bA">'+p.cat+'</span></td><td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td><td style="color:#64748b">'+p.min+'</td><td style="color:#64748b">'+p.max+'</td><td style="color:#64748b">'+(p.loc||'—')+'</td><td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำกว่า Min':'ปกติ')+'</span></td></tr>').join('');
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">รายการอะไหล่ทั้งหมด '+parts.length+' รายการ</div><div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่ออะไหล่</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>ตำแหน่ง</th><th>สถานะ</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+
+function rWith(){
+  const o=parts.map(p=>'<option value="'+p.id+'" data-qty="'+p.qty+'" data-min="'+p.min+'" data-name="'+p.name+'">['+p.pn+'] '+p.name+' — เหลือ '+p.qty+'</option>').join('');
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div><div style="font-size:.72rem;color:#64748b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div><div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div><div id="wE" class="toast error"><i class="ti ti-alert-circle"></i><span id="wEM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลเบิก</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput" id="wP" onchange="wPrev()"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่เบิก</label><input class="finput" type="number" id="wQ" min="1" value="1" oninput="wPrev()"><label class="flabel">Work Order / Ref.</label><input class="finput" type="text" id="wR" placeholder="WO-2025-XXX"><label class="flabel">ผู้เบิก</label><input class="finput" type="text" id="wU" placeholder="ชื่อผู้เบิก"><div class="preview-box" id="wPB" style="opacity:.4"><div class="preview-row"><span class="pl">อะไหล่</span><span class="pv" id="pN">—</span></div><div class="preview-row"><span class="pl">เบิกออก</span><span class="pv" id="pO">—</span></div><div class="preview-row"><span class="pl">Stock ก่อน</span><span class="pv" id="pB">—</span></div><div class="preview-row"><span class="pl">Stock หลัง</span><span class="pv" id="pA">—</span></div></div><button class="btn btn-red" onclick="doW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button></div></div></div>';
+}
+
+window.wPrev=function(){
+  const s=document.getElementById('wP'),o=s.options[s.selectedIndex];
+  if(!o.value)return;
+  const q=parseInt(o.dataset.qty),n=parseInt(document.getElementById('wQ').value)||0,a=q-n;
+  document.getElementById('pN').textContent=o.dataset.name;
+  document.getElementById('pO').textContent='-'+n;
+  document.getElementById('pB').textContent=q;
+  const el=document.getElementById('pA');el.textContent=a;el.style.color=a<0?'#dc2626':a<=parseInt(o.dataset.min)?'#f87171':'#4ade80';
+  document.getElementById('wPB').style.opacity='1';
+}
+
+window.doW=async function(){
+  const s=document.getElementById('wP'),o=s.options[s.selectedIndex];
+  document.getElementById('wE').style.display='none';document.getElementById('wT').style.display='none';
+  if(!o.value){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='กรุณาเลือกอะไหล่';return;}
+  const n=parseInt(document.getElementById('wQ').value)||0,u=document.getElementById('wU').value||'ไม่ระบุ',r=document.getElementById('wR').value||'—';
+  const p=parts.find(x=>x.id===o.value);
+  if(n<=0){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='จำนวนต้องมากกว่า 0';return;}
+  if(n>p.qty){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='Stock ไม่พอ — มีแค่ '+p.qty+' ชิ้น';return;}
+  const bef=p.qty,aft=bef-n;
+  await db.collection('parts').doc(p.id).update({qty:aft});
+  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,action:'WITHDRAW',change:-n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
+  if(aft<=p.min&&!alerts.find(a=>a.pn===p.pn&&a.status==='PENDING'))
+    await db.collection('alerts').add({partId:p.id,part:p.name,pn:p.pn,qty:aft,min:p.min,suggest:p.max-aft,loc:p.loc||'—',status:'PENDING',time:firebase.firestore.FieldValue.serverTimestamp()});
+  document.getElementById('wT').style.display='flex';document.getElementById('wM').textContent='เบิกสำเร็จ — '+p.name+' -'+n+' ชิ้น (คงเหลือ '+aft+')';
+  s.value='';document.getElementById('wPB').style.opacity='.4';await loadAll();
+}
+
+function rRec(){
+  const o=parts.map(p=>'<option value="'+p.id+'">['+p.pn+'] '+p.name+' — เหลือ '+p.qty+'</option>').join('');
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">รับอะไหล่เข้าคลัง</div><div id="rT" class="toast success"><i class="ti ti-check"></i><span id="rM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput" id="rP"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่รับเข้า</label><input class="finput" type="number" id="rQ" min="1" value="10"><label class="flabel">PO / Ref.</label><input class="finput" type="text" id="rR" placeholder="PO-2025-XXX"><label class="flabel">ผู้รับ</label><input class="finput" type="text" id="rU" placeholder="ชื่อผู้รับ"><button class="btn btn-green" onclick="doR()"><i class="ti ti-arrow-down-circle"></i> ยืนยันรับเข้าคลัง</button></div></div></div>';
+}
+
+window.doR=async function(){
+  const s=document.getElementById('rP'),o=s.options[s.selectedIndex];
+  if(!o.value){alert('กรุณาเลือกอะไหล่');return;}
+  const n=parseInt(document.getElementById('rQ').value)||0,u=document.getElementById('rU').value||'ไม่ระบุ',r=document.getElementById('rR').value||'—';
+  if(n<=0){alert('จำนวนต้องมากกว่า 0');return;}
+  const p=parts.find(x=>x.id===o.value),bef=p.qty,aft=bef+n;
+  await db.collection('parts').doc(p.id).update({qty:aft});
+  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,action:'RECEIVE',change:n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
+  const ai=alerts.find(a=>a.pn===p.pn&&(a.status==='PENDING'||a.status==='ORDERED'));
+  if(ai&&aft>p.min)await db.collection('alerts').doc(ai.id).update({status:'RESOLVED'});
+  document.getElementById('rT').style.display='flex';document.getElementById('rM').textContent='รับเข้าสำเร็จ — '+p.name+' +'+n+' ชิ้น (คงเหลือ '+aft+')';
+  s.value='';await loadAll();
+}
+
+function rLog(){
+  const r=logs.map(l=>'<tr><td style="color:#475569;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td><td style="color:#f1f5f9">'+(l.partName||'—')+'</td><td style="color:#94a3b8">'+(l.user||'—')+'</td><td>'+ba(l.action)+'</td><td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td><td style="color:#64748b">'+l.before+'</td><td style="color:#f1f5f9">'+l.after+'</td><td style="color:#475569;font-size:.65rem">'+(l.ref||'—')+'</td></tr>').join('');
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">ประวัติการเคลื่อนไหว Stock</div><div class="card"><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>ก่อน</th><th>หลัง</th><th>Ref.</th></tr></thead><tbody>'+(r||'<tr><td colspan="8" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div>';
+}
+
+function rAlerts(){
+  const r=alerts.map(a=>'<tr><td><div style="color:#f1f5f9;font-weight:600">'+a.part+'</div><div style="font-size:.65rem;color:#475569">'+a.pn+'</div></td><td style="color:#64748b">'+(a.loc||'—')+'</td><td style="color:#f87171;font-weight:700">'+a.qty+'</td><td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td><td><span class="badge '+(a.status==='PENDING'?'bP':a.status==='ORDERED'?'bA':'bR')+'">'+a.status+'</span></td><td>'+(a.status==='PENDING'?'<button class="btn btn-blue" style="width:auto;padding:4px 10px;font-size:.68rem" onclick="doAlt(\''+a.id+'\')"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>':'—')+'</td></tr>').join('');
+  return '<div id="aT" class="toast success"><i class="ti ti-check"></i>อัปเดตสถานะแล้ว</div><div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Reorder Alerts</div><div class="card"><table class="t"><thead><tr><th>อะไหล่</th><th>ตำแหน่ง</th><th>Stock</th><th>ควรสั่ง</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'+(r||'<tr><td colspan="6" style="text-align:center;color:#4ade80;padding:20px">✅ Stock ปกติทุกรายการ</td></tr>')+'</tbody></table></div>';
+}
+
+window.doAlt=async function(id){
+  await db.collection('alerts').doc(id).update({status:'ORDERED'});
+  await loadAll();
+  document.getElementById('pageContent').innerHTML=rAlerts();
+  document.getElementById('aT').style.display='flex';
+}
+
+(async function(){
+  try{
+    await seedIfEmpty();
+    await loadAll();
+    document.getElementById('pageContent').innerHTML=rDash();
+  }catch(e){
+    document.getElementById('pageContent').innerHTML='<div class="loading" style="color:#f87171">❌ Error: '+e.message+'<br><small>ตรวจสอบ Firestore Rules และ Config</small></div>';
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
