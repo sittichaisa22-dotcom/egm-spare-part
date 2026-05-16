@@ -85,7 +85,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig={apiKey:"AIzaSyBYPu_pV-KmuVo4otitNWoeIWyhD0sMuMo",authDomain:"egm-spare-part-system.firebaseapp.com",projectId:"egm-spare-part-system",storageBucket:"egm-spare-part-system.firebasestorage.app.com",messagingSenderId:"796709157808",appId:"1:796709157808:web:1c4823af1259046b5b4b35"};
+const firebaseConfig={apiKey:"AIzaSyBYPu_pV-KmuVo4otitNWoeIWyhD0sMuMo",authDomain:"egm-spare-part-system.firebaseapp.com",projectId:"egm-spare-part-system",storageBucket:"egm-spare-part-system.firebasestorage.app",messagingSenderId:"796709157808",appId:"1:796709157808:web:1c4823af1259046b5b4b35"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 let parts=[],logs=[],alerts=[];
@@ -96,7 +96,7 @@ function ba(a){const m={WITHDRAW:'bW',RECEIVE:'bR',ADJUST:'bA'};return '<span cl
 function ft(ts){try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('th-TH')+' '+d.toTimeString().slice(0,5)}catch(e){return '—'}}
 
 async function loadParts(){const s=await db.collection('parts').get();parts=s.docs.map(d=>({id:d.id,...d.data()}))}
-async function loadLogs(){const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}
+async function loadLogs(){try{const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){console.warn('loadLogs fallback:',e.message);try{const s=await db.collection('logs').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const ta=a.time?.toDate?.()||new Date(0),tb=b.time?.toDate?.()||new Date(0);return tb-ta})}catch(e2){logs=[];console.error('loadLogs failed:',e2.message)}}}}
 async function loadAlerts(){
   const s=await db.collection('alerts').get();
   alerts=s.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.status==='PENDING'||a.status==='ORDERED');
