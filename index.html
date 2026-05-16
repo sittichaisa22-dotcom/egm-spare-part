@@ -96,7 +96,7 @@ function ba(a){const m={WITHDRAW:'bW',RECEIVE:'bR',ADJUST:'bA'};return '<span cl
 function ft(ts){try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('th-TH')+' '+d.toTimeString().slice(0,5)}catch(e){return '—'}}
 
 async function loadParts(){const s=await db.collection('parts').get();parts=s.docs.map(d=>({id:d.id,...d.data()}))}
-async function loadLogs(){try{const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){console.warn('loadLogs fallback:',e.message);try{const s=await db.collection('logs').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const ta=a.time?.toDate?.()||new Date(0),tb=b.time?.toDate?.()||new Date(0);return tb-ta})}catch(e2){logs=[];console.error('loadLogs failed:',e2.message)}}}}
+async function loadLogs(){try{const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){console.warn('loadLogs fallback:',e.message);try{const s=await db.collection('logs').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const ta=a.time&&a.time.toDate?a.time.toDate():new Date(0),tb=b.time&&b.time.toDate?b.time.toDate():new Date(0);return tb-ta})}catch(e2){logs=[];console.error('loadLogs failed:',e2.message)}}}
 async function loadAlerts(){
   const s=await db.collection('alerts').get();
   alerts=s.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.status==='PENDING'||a.status==='ORDERED');
