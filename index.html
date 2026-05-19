@@ -373,11 +373,18 @@ function rDash(){
   return ah+'<div class="stat-grid"><div class="stat blue"><div class="stat-lbl">Part ทั้งหมด</div><div class="stat-val">'+t+'</div></div><div class="stat green"><div class="stat-lbl">Stock ปกติ</div><div class="stat-val">'+ok+'</div></div><div class="stat amber"><div class="stat-lbl">Stock ต่ำ</div><div class="stat-val">'+low+'</div></div><div class="stat red"><div class="stat-lbl">หมด Stock</div><div class="stat-val">'+out+'</div></div></div><div class="row2"><div class="card"><div class="card-hd"><i class="ti ti-box"></i> Stock Overview</div><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ</th><th>สถานะ</th><th>Qty</th><th>Level</th></tr></thead><tbody>'+pr+'</tbody></table></div><div class="card"><div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th></tr></thead><tbody>'+(lr||'<tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
 }
 
-function rParts(){
+function rParts(q){
   const isAdmin=currentUser.role==='admin';
   const addBtn=isAdmin?'<button class="btn-sm blue" onclick="openPartModal(null,event)"><i class="ti ti-plus"></i> เพิ่มอะไหล่</button>':'';
   const clickRow=isAdmin?'style="cursor:pointer" onclick="openPartModal(this.dataset.id,event)" ':'';
-  const r=parts.map(p=>{
+  const kw=(q||'').toLowerCase().trim();
+  const filtered=kw?parts.filter(p=>
+    (p.name||'').toLowerCase().includes(kw)||
+    (p.pn||'').toLowerCase().includes(kw)||
+    (p.model||'').toLowerCase().includes(kw)||
+    (p.cat||'').toLowerCase().includes(kw)
+  ):parts;
+  const r=filtered.map(p=>{
     const safeId=p.id;
     return '<tr '+clickRow+'data-id="'+safeId+'">'
       +'<td style="color:#64748b;font-size:.68rem">'+p.pn+'</td>'
@@ -390,9 +397,25 @@ function rParts(){
       +'<td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำ':'OK')+'</span></td>'
       +'</tr>';
   }).join('');
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:.95rem;font-weight:700">รายการอะไหล่ทั้งหมด '+parts.length+' รายการ</div>'+addBtn+'</div>'
+  const searchBar='<div style="position:relative;margin-bottom:10px">'
+    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569;font-size:.9rem"></i>'
+    +'<input id="partSearch" class="finput-sm" type="text" placeholder="ค้นหาชื่อ, Part No., Model, หมวด..." '
+    +'style="padding-left:32px;margin-bottom:0" value="'+(kw||'')+'" '
+    +'oninput="filterParts(this.value)">'
+    +'</div>';
+  const countTxt=kw?'พบ '+filtered.length+' รายการ (จาก '+parts.length+')':'รายการอะไหล่ทั้งหมด '+parts.length+' รายการ';
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div>'+addBtn+'</div>'
+    +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
-    +'<div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>สถานะ</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+    +'<div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>สถานะ</th></tr></thead><tbody>'
+    +(r||'<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>')
+    +'</tbody></table></div>';
+}
+
+window.filterParts=function(val){
+  document.getElementById('pageContent').innerHTML=rParts(val);
+  const el=document.getElementById('partSearch');
+  if(el){el.focus();el.setSelectionRange(val.length,val.length);}
 }
 
 window.openPartModal=function(id,event){
