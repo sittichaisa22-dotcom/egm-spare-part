@@ -333,10 +333,24 @@ function ft(ts){try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocale
 async function loadParts(){const s=await db.collection('parts').get();parts=s.docs.map(d=>({id:d.id,...d.data()}))}
 async function loadLogs(){try{const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){try{const s=await db.collection('logs').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const ta=a.time&&a.time.toDate?a.time.toDate():new Date(0),tb=b.time&&b.time.toDate?b.time.toDate():new Date(0);return tb-ta})}catch(e2){logs=[]}}}
 async function loadAlerts(){
+  // ดึง alert status จาก Firestore (ORDERED เท่านั้น)
   const s=await db.collection('alerts').get();
-  alerts=s.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.status==='PENDING'||a.status==='ORDERED');
+  const alertDocs=s.docs.map(d=>({id:d.id,...d.data()}));
+  // คำนวณ alerts จาก parts โดยตรง แล้ว merge status จาก alertDocs
+  alerts=parts.filter(p=>p.qty<=p.min).map(p=>{
+    const existing=alertDocs.find(a=>a.pn===p.pn&&a.status==='ORDERED');
+    return {
+      id:existing?existing.id:null,
+      part:p.name, pn:p.pn, qty:p.qty,
+      min:p.min, max:p.max,
+      suggest:Math.max(0,p.max-p.qty),
+      loc:p.loc||'—',
+      status:existing?'ORDERED':'PENDING'
+    };
+  });
   const cnt=alerts.filter(a=>a.status==='PENDING').length;
-  document.getElementById('alertBadge').textContent=cnt||'';
+  const badge=document.getElementById('alertBadge');
+  if(badge)badge.textContent=cnt||'';
 }
 async function loadAll(){await Promise.all([loadParts(),loadLogs(),loadAlerts()])}
 
@@ -541,12 +555,49 @@ function rLog(){
 }
 
 function rAlerts(){
-  const r=alerts.map(a=>'<tr><td><div style="color:#f1f5f9;font-weight:600">'+a.part+'</div><div style="font-size:.65rem;color:#475569">'+a.pn+'</div></td><td style="color:#64748b">'+(a.loc||'—')+'</td><td style="color:#f87171;font-weight:700">'+a.qty+'</td><td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td><td><span class="badge '+(a.status==='PENDING'?'bP':a.status==='ORDERED'?'bA':'bR')+'">'+a.status+'</span></td><td>'+(a.status==='PENDING'?'<button class="btn-sm blue" onclick="doAlt(\''+a.id+'\')"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>':'—')+'</td></tr>').join('');
-  return '<div id="aT" class="toast success"><i class="ti ti-check"></i>อัปเดตสถานะแล้ว</div><div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Reorder Alerts</div><div class="card"><table class="t"><thead><tr><th>อะไหล่</th><th>ตำแหน่ง</th><th>Stock</th><th>ควรสั่ง</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'+(r||'<tr><td colspan="6" style="text-align:center;color:#4ade80;padding:20px">✅ Stock ปกติทุกรายการ</td></tr>')+'</tbody></table></div>';
+  const pending=alerts.filter(a=>a.status==='PENDING');
+  const ordered=alerts.filter(a=>a.status==='ORDERED');
+  const rows=alerts.map(a=>{
+    const statusBadge=a.status==='ORDERED'
+      ?'<span class="badge bA">สั่งซื้อแล้ว</span>'
+      :'<span class="badge bP">รอสั่ง</span>';
+    const safePn=a.pn.replace(/'/g,'&#39;');
+    const safeId=(a.id||'').replace(/'/g,'&#39;');
+    const actionBtn=a.status==='PENDING'
+      ?'<button class="btn-sm blue" onclick="doAlt(this.dataset.pn)" data-pn="'+safePn+'"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>'
+      :'<button class="btn-sm red" onclick="undoAlt(this.dataset.pn,this.dataset.id)" data-pn="'+safePn+'" data-id="'+safeId+'">ยกเลิก</button>';
+    return '<tr>'
+      +'<td><div style="color:#f1f5f9;font-weight:600;font-size:.78rem">'+a.part+'</div>'
+      +'<div style="font-size:.65rem;color:#475569">'+a.pn+'</div></td>'
+      +'<td style="color:#64748b">'+(a.loc||'—')+'</td>'
+      +'<td style="color:#f87171;font-weight:700">'+a.qty+'</td>'
+      +'<td style="color:#64748b;font-size:.68rem">'+a.min+'</td>'
+      +'<td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td>'
+      +'<td>'+statusBadge+'</td>'
+      +'<td>'+actionBtn+'</td>'
+      +'</tr>';
+  }).join('');
+  const summary='<div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:12px">'
+    +'<div class="stat amber"><div class="stat-lbl">รอสั่งซื้อ</div><div class="stat-val">'+pending.length+'</div></div>'
+    +'<div class="stat blue"><div class="stat-lbl">สั่งซื้อแล้ว</div><div class="stat-val">'+ordered.length+'</div></div>'
+    +'</div>';
+  return '<div id="aT" class="toast success"><i class="ti ti-check"></i> อัปเดตสถานะแล้ว</div>'
+    +'<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Reorder Alerts</div>'
+    +summary
+    +'<div class="card"><table class="t"><thead><tr><th>อะไหล่</th><th>ตำแหน่ง</th><th>Stock</th><th>Min</th><th>ควรสั่ง</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'
+    +(rows||'<tr><td colspan="7" style="text-align:center;color:#4ade80;padding:20px">✅ Stock ปกติทุกรายการ</td></tr>')
+    +'</tbody></table></div>';
 }
 
-window.doAlt=async function(id){
-  await db.collection('alerts').doc(id).update({status:'ORDERED'});
+window.doAlt=async function(pn){
+  // บันทึก ORDERED ลง Firestore
+  const a=alerts.find(x=>x.pn===pn);
+  if(!a)return;
+  if(a.id){
+    await db.collection('alerts').doc(a.id).update({status:'ORDERED'});
+  }else{
+    await db.collection('alerts').add({pn:a.pn,part:a.part,qty:a.qty,min:a.min,suggest:a.suggest,loc:a.loc,status:'ORDERED',time:firebase.firestore.FieldValue.serverTimestamp()});
+  }
   await loadAll();
   document.getElementById('pageContent').innerHTML=rAlerts();
   document.getElementById('aT').style.display='flex';
@@ -560,3 +611,10 @@ window.doAlt=async function(id){
 </script>
 </body>
 </html>
+window.undoAlt=async function(pn,id){
+  if(!id)return;
+  await db.collection('alerts').doc(id).update({status:'PENDING'});
+  await loadAll();
+  document.getElementById('pageContent').innerHTML=rAlerts();
+}
+
