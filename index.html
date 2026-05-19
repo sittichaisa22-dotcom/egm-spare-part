@@ -8,7 +8,22 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0f1724;font-family:'Segoe UI',sans-serif;color:#f1f5f9}
-.app{display:flex;height:100vh;overflow:hidden}
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;height:100vh;background:#0f1724}
+.login-box{background:#1a2535;border:1px solid #1e2d42;border-radius:12px;padding:36px 32px;width:100%;max-width:360px}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .icon{font-size:2rem;color:#2563eb}
+.login-logo h1{font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-top:6px}
+.login-logo p{font-size:.72rem;color:#475569;margin-top:2px}
+.flabel{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:block}
+.finput{width:100%;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;color:#f1f5f9;padding:9px 12px;font-size:.82rem;outline:none;margin-bottom:12px}
+.finput:focus{border-color:#2563eb}
+.btn-login{width:100%;background:#2563eb;border:none;border-radius:6px;padding:10px;font-size:.85rem;font-weight:700;color:#fff;cursor:pointer;margin-top:4px}
+.btn-login:hover{background:#1d4ed8}
+.login-err{background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);color:#f87171;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:12px;display:none}
+/* APP */
+.app{display:none;height:100vh;overflow:hidden;flex-direction:row}
+.app.show{display:flex}
 .sidebar{width:210px;background:#151f2e;border-right:1px solid #1e2d42;display:flex;flex-direction:column;flex-shrink:0}
 .sb-brand{padding:16px;border-bottom:1px solid #1e2d42;font-size:.82rem;font-weight:700;color:#2563eb}
 .sb-brand span{color:#64748b;font-weight:400;font-size:.7rem;display:block;margin-top:2px}
@@ -18,12 +33,24 @@ body{background:#0f1724;font-family:'Segoe UI',sans-serif;color:#f1f5f9}
 .sb-link.active{color:#f1f5f9;background:rgba(37,99,235,.15);border-left-color:#2563eb}
 .sb-link i{font-size:.9rem;width:16px;text-align:center}
 .sb-badge{margin-left:auto;background:#dc2626;color:#fff;border-radius:8px;padding:1px 6px;font-size:.62rem;font-weight:700}
+.sb-bottom{margin-top:auto;padding:12px;border-top:1px solid #1e2d42}
+.btn-logout{width:100%;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#f87171;border-radius:6px;padding:7px;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-logout:hover{background:rgba(220,38,38,.2)}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:48px;background:#151f2e;border-bottom:1px solid #1e2d42;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
 .topbar .title{font-size:.88rem;font-weight:700;color:#f1f5f9;flex:1}
 .user-pill{display:flex;align-items:center;gap:6px;background:#1e2d42;border-radius:16px;padding:4px 12px;font-size:.72rem;color:#94a3b8}
+.role-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:4px}
+.role-admin{background:rgba(37,99,235,.2);color:#60a5fa}
+.role-user{background:rgba(22,163,74,.15);color:#4ade80}
 .dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
 .page{flex:1;overflow-y:auto;padding:16px}
+/* ADMIN PANEL */
+.admin-card{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;overflow:hidden;margin-bottom:12px}
+.admin-hd{background:#1e2d42;padding:8px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:flex;align-items:center;gap:6px;justify-content:space-between}
+.btn-sm{border:none;border-radius:4px;padding:4px 10px;font-size:.68rem;font-weight:600;cursor:pointer;color:#fff}
+.btn-sm.blue{background:#2563eb}.btn-sm.red{background:#dc2626}.btn-sm.green{background:#16a34a}
+/* STAT GRID */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;padding:12px 14px}
 .stat.blue{border-top:3px solid #2563eb}.stat.red{border-top:3px solid #dc2626}.stat.amber{border-top:3px solid #d97706}.stat.green{border-top:3px solid #16a34a}
@@ -41,9 +68,8 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 .bW{background:rgba(220,38,38,.15);color:#f87171}.bR{background:rgba(22,163,74,.15);color:#4ade80}
 .bA{background:rgba(14,165,233,.15);color:#38bdf8}.bP{background:rgba(217,119,6,.2);color:#fbbf24}
 .pform{padding:12px}
-.flabel{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:block}
-.finput{width:100%;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;color:#f1f5f9;padding:7px 10px;font-size:.78rem;outline:none;margin-bottom:10px}
-.finput:focus{border-color:#2563eb}
+.finput-sm{width:100%;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;color:#f1f5f9;padding:7px 10px;font-size:.78rem;outline:none;margin-bottom:10px}
+.finput-sm:focus{border-color:#2563eb}
 .btn{width:100%;border:none;border-radius:6px;padding:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:#fff;margin-bottom:6px}
 .btn-blue{background:#2563eb}.btn-green{background:#16a34a}.btn-red{background:#dc2626}
 .preview-box{background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:10px 12px;font-size:.75rem;margin-bottom:10px}
@@ -57,10 +83,35 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .bar-wrap{height:3px;background:#1e2d42;border-radius:2px;margin-top:3px;width:50px}
 .bar-fill{height:100%;border-radius:2px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#1a2535;border:1px solid #1e2d42;border-radius:10px;padding:24px;width:100%;max-width:380px}
+.modal h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:#f1f5f9}
+.modal-footer{display:flex;gap:8px;margin-top:16px}
+.modal-footer button{flex:1;border:none;border-radius:6px;padding:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:#fff}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- LOGIN PAGE -->
+<div class="login-wrap" id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon"><i class="ti ti-packages"></i></div>
+      <h1>EGM Spare Part</h1>
+      <p>Inventory System v2.0</p>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <label class="flabel">Username</label>
+    <input class="finput" type="text" id="loginUser" placeholder="กรอก Username" autocomplete="username">
+    <label class="flabel">Password</label>
+    <input class="finput" type="password" id="loginPass" placeholder="กรอก Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()"><i class="ti ti-login"></i> เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appPage">
   <div class="sidebar">
     <div class="sb-brand"><i class="ti ti-packages"></i> EGM Spare Part<span>Inventory System v2.0</span></div>
     <div class="sb-sec">ภาพรวม</div>
@@ -68,17 +119,46 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <div class="sb-sec">จัดการ Stock</div>
     <div class="sb-link" onclick="nav('parts',this)"><i class="ti ti-box"></i>รายการอะไหล่</div>
     <div class="sb-link" onclick="nav('withdraw',this)"><i class="ti ti-arrow-up-circle"></i>เบิกอะไหล่</div>
-    <div class="sb-link" onclick="nav('receive',this)"><i class="ti ti-arrow-down-circle"></i>รับอะไหล่เข้า</div>
+    <div class="sb-link" onclick="nav('receive',this)"><i class="ti ti-arrow-down-circle"></i>รับอะไหหล่เข้า</div>
     <div class="sb-sec">รายงาน</div>
     <div class="sb-link" onclick="nav('log',this)"><i class="ti ti-history"></i>ประวัติ Stock</div>
     <div class="sb-link" onclick="nav('alerts',this)"><i class="ti ti-bell"></i>Reorder Alerts<span class="sb-badge" id="alertBadge"></span></div>
+    <div class="sb-sec admin-only" style="display:none">Admin</div>
+    <div class="sb-link admin-only" style="display:none" onclick="nav('users',this)"><i class="ti ti-users"></i>จัดการ Users</div>
+    <div class="sb-bottom">
+      <div style="font-size:.68rem;color:#475569;margin-bottom:8px;text-align:center" id="sideUserInfo"></div>
+      <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> ออกจากระบบ</button>
+    </div>
   </div>
   <div class="main">
     <div class="topbar">
       <div class="title" id="pageTitle"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
-      <div class="user-pill"><span class="dot"></span>EGM Admin</div>
+      <div class="user-pill"><span class="dot"></span><span id="topUserName">—</span><span class="role-badge" id="topRoleBadge"></span></div>
     </div>
-    <div class="page" id="pageContent"><div class="loading">กำลังเชื่อมต่อ Firebase...</div></div>
+    <div class="page" id="pageContent"><div class="loading">กำลังโหลด...</div></div>
+  </div>
+</div>
+
+<!-- MODAL: เพิ่ม User -->
+<div class="modal-overlay" id="modalAddUser">
+  <div class="modal">
+    <h3><i class="ti ti-user-plus"></i> เพิ่ม User ใหม่</h3>
+    <div class="login-err" id="addUserErr"></div>
+    <label class="flabel">Username</label>
+    <input class="finput-sm" type="text" id="newUsername" placeholder="ตั้ง Username">
+    <label class="flabel">Password</label>
+    <input class="finput-sm" type="password" id="newPassword" placeholder="ตั้ง Password (อย่างน้อย 6 ตัว)">
+    <label class="flabel">ชื่อแสดง</label>
+    <input class="finput-sm" type="text" id="newDisplayName" placeholder="ชื่อ-นามสกุล หรือชื่อเล่น">
+    <label class="flabel">Role</label>
+    <select class="finput-sm" id="newRole">
+      <option value="user">User — ดู/เบิก/รับ</option>
+      <option value="admin">Admin — สิทธิ์เต็ม</option>
+    </select>
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalAddUser')">ยกเลิก</button>
+      <button style="background:#2563eb" onclick="doAddUser()">สร้าง User</button>
+    </div>
   </div>
 </div>
 
@@ -88,15 +168,117 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 const firebaseConfig={apiKey:"AIzaSyBYPu_pV-KmuVo4otitNWoeIWyhD0sMuMo",authDomain:"egm-spare-part-system.firebaseapp.com",projectId:"egm-spare-part-system",storageBucket:"egm-spare-part-system.firebasestorage.app",messagingSenderId:"796709157808",appId:"1:796709157808:web:1c4823af1259046b5b4b35"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
-let parts=[],logs=[],alerts=[];
 
+let parts=[],logs=[],alerts=[],currentUser=null;
+
+// ---- AUTH ----
+function hashPass(p){let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0;}return h.toString(36);}
+
+async function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  err.style.display='none';
+  if(!u||!p){err.textContent='กรุณากรอก Username และ Password';err.style.display='block';return;}
+  try{
+    const snap=await db.collection('users').where('username','==',u).limit(1).get();
+    if(snap.empty){err.textContent='ไม่พบ Username นี้ในระบบ';err.style.display='block';return;}
+    const doc=snap.docs[0];const ud=doc.data();
+    if(ud.passwordHash!==hashPass(p)){err.textContent='Password ไม่ถูกต้อง';err.style.display='block';return;}
+    if(ud.disabled){err.textContent='บัญชีนี้ถูกระงับการใช้งาน';err.style.display='block';return;}
+    currentUser={id:doc.id,...ud};
+    sessionStorage.setItem('egmUser',JSON.stringify(currentUser));
+    showApp();
+  }catch(e){err.textContent='เกิดข้อผิดพลาด: '+e.message;err.style.display='block';}
+}
+
+function doLogout(){
+  sessionStorage.removeItem('egmUser');
+  currentUser=null;
+  document.getElementById('appPage').classList.remove('show');
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+
+function showApp(){
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('appPage').classList.add('show');
+  // แสดง UI ตาม role
+  const isAdmin=currentUser.role==='admin';
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=isAdmin?'':'none');
+  document.getElementById('topUserName').textContent=currentUser.displayName||currentUser.username;
+  const rb=document.getElementById('topRoleBadge');
+  rb.textContent=isAdmin?'Admin':'User';
+  rb.className='role-badge '+(isAdmin?'role-admin':'role-user');
+  document.getElementById('sideUserInfo').textContent=(currentUser.displayName||currentUser.username);
+  initApp();
+}
+
+async function initApp(){
+  try{
+    await seedAdmin();
+    await loadAll();
+    document.getElementById('pageContent').innerHTML=rDash();
+  }catch(e){
+    document.getElementById('pageContent').innerHTML='<div class="loading" style="color:#f87171">Error: '+e.message+'</div>';
+  }
+}
+
+// สร้าง admin เริ่มต้นถ้ายังไม่มี
+async function seedAdmin(){
+  const s=await db.collection('users').where('role','==','admin').limit(1).get();
+  if(!s.empty)return;
+  await db.collection('users').add({username:'admin',passwordHash:hashPass('admin1234'),displayName:'EGM Admin',role:'admin',disabled:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+}
+
+// ---- USERS PAGE (Admin only) ----
+async function rUsers(){
+  const snap=await db.collection('users').get();
+  const users=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const rows=users.map(u=>'<tr><td style="color:#f1f5f9;font-weight:600">'+(u.displayName||'—')+'</td><td style="color:#94a3b8">'+u.username+'</td><td><span class="badge '+(u.role==='admin'?'bA':'bR')+'">'+(u.role==='admin'?'Admin':'User')+'</span></td><td><span class="badge '+(u.disabled?'bW':'bR')+'">'+(u.disabled?'ระงับ':'ใช้งาน')+'</span></td><td style="display:flex;gap:4px;padding:7px 10px">'+(u.id!==currentUser.id?'<button class="btn-sm '+(u.disabled?'green':'red')+'" onclick="toggleUser(\''+u.id+'\','+u.disabled+')">'+( u.disabled?'เปิดใช้':'ระงับ')+'</button><button class="btn-sm red" onclick="deleteUser(\''+u.id+'\',\''+u.username+'\')">ลบ</button>':'<span style="color:#475569;font-size:.65rem">— บัญชีตัวเอง —</span>')+'</td></tr>').join('');
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:.95rem;font-weight:700">จัดการ Users ('+users.length+' บัญชี)</div><button class="btn-sm blue" onclick="openModal(\'modalAddUser\')"><i class="ti ti-user-plus"></i> เพิ่ม User</button></div><div class="admin-card"><table class="t"><thead><tr><th>ชื่อ</th><th>Username</th><th>Role</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+async function doAddUser(){
+  const un=document.getElementById('newUsername').value.trim();
+  const pw=document.getElementById('newPassword').value;
+  const dn=document.getElementById('newDisplayName').value.trim();
+  const role=document.getElementById('newRole').value;
+  const err=document.getElementById('addUserErr');
+  err.style.display='none';
+  if(!un||!pw||!dn){err.textContent='กรุณากรอกข้อมูลให้ครบ';err.style.display='block';return;}
+  if(pw.length<6){err.textContent='Password ต้องมีอย่างน้อย 6 ตัวอักษร';err.style.display='block';return;}
+  const chk=await db.collection('users').where('username','==',un).limit(1).get();
+  if(!chk.empty){err.textContent='Username นี้มีอยู่แล้ว';err.style.display='block';return;}
+  await db.collection('users').add({username:un,passwordHash:hashPass(pw),displayName:dn,role:role,disabled:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  closeModal('modalAddUser');
+  document.getElementById('newUsername').value='';document.getElementById('newPassword').value='';document.getElementById('newDisplayName').value='';
+  nav('users',document.querySelector('.sb-link.active'));
+}
+
+window.toggleUser=async function(id,isDisabled){
+  await db.collection('users').doc(id).update({disabled:!isDisabled});
+  nav('users',document.querySelector('.sb-link.active'));
+}
+
+window.deleteUser=async function(id,un){
+  if(!confirm('ลบ User "'+un+'" ออกจากระบบ?'))return;
+  await db.collection('users').doc(id).delete();
+  nav('users',document.querySelector('.sb-link.active'));
+}
+
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');document.getElementById('addUserErr').style.display='none';}
+
+// ---- HELPERS ----
 function pct(q,max){return Math.min(100,Math.round(q/max*100))}
 function sc(q,min){return q===0?'#dc2626':q<=min?'#f87171':'#4ade80'}
 function ba(a){const m={WITHDRAW:'bW',RECEIVE:'bR',ADJUST:'bA'};return '<span class="badge '+(m[a]||'bA')+'">'+a+'</span>'}
 function ft(ts){try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('th-TH')+' '+d.toTimeString().slice(0,5)}catch(e){return '—'}}
 
 async function loadParts(){const s=await db.collection('parts').get();parts=s.docs.map(d=>({id:d.id,...d.data()}))}
-async function loadLogs(){try{const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){console.warn('loadLogs fallback:',e.message);try{const s=await db.collection('logs').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const ta=a.time&&a.time.toDate?a.time.toDate():new Date(0),tb=b.time&&b.time.toDate?b.time.toDate():new Date(0);return tb-ta})}catch(e2){logs=[];console.error('loadLogs failed:',e2.message)}}}
+async function loadLogs(){try{const s=await db.collection('logs').orderBy('time','desc').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){try{const s=await db.collection('logs').limit(50).get();logs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{const ta=a.time&&a.time.toDate?a.time.toDate():new Date(0),tb=b.time&&b.time.toDate?b.time.toDate():new Date(0);return tb-ta})}catch(e2){logs=[]}}}
 async function loadAlerts(){
   const s=await db.collection('alerts').get();
   alerts=s.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.status==='PENDING'||a.status==='ORDERED');
@@ -105,19 +287,13 @@ async function loadAlerts(){
 }
 async function loadAll(){await Promise.all([loadParts(),loadLogs(),loadAlerts()])}
 
-async function seedIfEmpty(){
-  const s=await db.collection('parts').limit(1).get();
-  if(!s.empty)return;
-  const d=[{pn:'EL-001',name:'Contactor 3P 220V',cat:'Electric',qty:8,min:5,max:20,loc:'A-01'},{pn:'EL-002',name:'Circuit Breaker 32A',cat:'Electric',qty:3,min:5,max:15,loc:'A-02'},{pn:'ME-001',name:'Bearing 6205',cat:'Mechanical',qty:12,min:5,max:30,loc:'B-01'},{pn:'ME-002',name:'V-Belt A-40',cat:'Mechanical',qty:2,min:5,max:20,loc:'B-02'},{pn:'EL-003',name:'Proximity Sensor 24V',cat:'Electric',qty:15,min:5,max:25,loc:'A-03'}];
-  for(const p of d)await db.collection('parts').add(p);
-}
-
 window.nav=async function(page,el){
   document.querySelectorAll('.sb-link').forEach(x=>x.classList.remove('active'));
   if(el)el.classList.add('active');
   document.getElementById('pageContent').innerHTML='<div class="loading">กำลังโหลด...</div>';
-  await loadAll();
-  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts'}[page]||page;
+  if(page!=='users')await loadAll();
+  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users'}[page]||page;
+  if(page==='users'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rUsers();return;}
   document.getElementById('pageContent').innerHTML={dashboard:rDash,parts:rParts,withdraw:rWith,receive:rRec,log:rLog,alerts:rAlerts}[page]();
 }
 
@@ -136,7 +312,8 @@ function rParts(){
 
 function rWith(){
   const o=parts.map(p=>'<option value="'+p.id+'" data-qty="'+p.qty+'" data-min="'+p.min+'" data-name="'+p.name+'">['+p.pn+'] '+p.name+' — เหลือ '+p.qty+'</option>').join('');
-  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div><div style="font-size:.72rem;color:#64748b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div><div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div><div id="wE" class="toast error"><i class="ti ti-alert-circle"></i><span id="wEM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลเบิก</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput" id="wP" onchange="wPrev()"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่เบิก</label><input class="finput" type="number" id="wQ" min="1" value="1" oninput="wPrev()"><label class="flabel">Work Order / Ref.</label><input class="finput" type="text" id="wR" placeholder="WO-2025-XXX"><label class="flabel">ผู้เบิก</label><input class="finput" type="text" id="wU" placeholder="ชื่อผู้เบิก"><div class="preview-box" id="wPB" style="opacity:.4"><div class="preview-row"><span class="pl">อะไหล่</span><span class="pv" id="pN">—</span></div><div class="preview-row"><span class="pl">เบิกออก</span><span class="pv" id="pO">—</span></div><div class="preview-row"><span class="pl">Stock ก่อน</span><span class="pv" id="pB">—</span></div><div class="preview-row"><span class="pl">Stock หลัง</span><span class="pv" id="pA">—</span></div></div><button class="btn btn-red" onclick="doW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button></div></div></div>';
+  const defUser=currentUser.displayName||currentUser.username;
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div><div style="font-size:.72rem;color:#64748b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div><div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div><div id="wE" class="toast error"><i class="ti ti-alert-circle"></i><span id="wEM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลเบิก</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput-sm" id="wP" onchange="wPrev()"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่เบิก</label><input class="finput-sm" type="number" id="wQ" min="1" value="1" oninput="wPrev()"><label class="flabel">Work Order / Ref.</label><input class="finput-sm" type="text" id="wR" placeholder="WO-2025-XXX"><label class="flabel">ผู้เบิก</label><input class="finput-sm" type="text" id="wU" value="'+defUser+'" placeholder="ชื่อผู้เบิก"><div class="preview-box" id="wPB" style="opacity:.4"><div class="preview-row"><span class="pl">อะไหล่</span><span class="pv" id="pN">—</span></div><div class="preview-row"><span class="pl">เบิกออก</span><span class="pv" id="pO">—</span></div><div class="preview-row"><span class="pl">Stock ก่อน</span><span class="pv" id="pB">—</span></div><div class="preview-row"><span class="pl">Stock หลัง</span><span class="pv" id="pA">—</span></div></div><button class="btn btn-red" onclick="doW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button></div></div></div>';
 }
 
 window.wPrev=function(){
@@ -154,13 +331,13 @@ window.doW=async function(){
   const s=document.getElementById('wP'),o=s.options[s.selectedIndex];
   document.getElementById('wE').style.display='none';document.getElementById('wT').style.display='none';
   if(!o.value){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='กรุณาเลือกอะไหล่';return;}
-  const n=parseInt(document.getElementById('wQ').value)||0,u=document.getElementById('wU').value||'ไม่ระบุ',r=document.getElementById('wR').value||'—';
+  const n=parseInt(document.getElementById('wQ').value)||0,u=document.getElementById('wU').value||currentUser.username,r=document.getElementById('wR').value||'—';
   const p=parts.find(x=>x.id===o.value);
   if(n<=0){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='จำนวนต้องมากกว่า 0';return;}
   if(n>p.qty){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='Stock ไม่พอ — มีแค่ '+p.qty+' ชิ้น';return;}
   const bef=p.qty,aft=bef-n;
   await db.collection('parts').doc(p.id).update({qty:aft});
-  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,action:'WITHDRAW',change:-n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
+  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,userId:currentUser.id,action:'WITHDRAW',change:-n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
   if(aft<=p.min&&!alerts.find(a=>a.pn===p.pn&&a.status==='PENDING'))
     await db.collection('alerts').add({partId:p.id,part:p.name,pn:p.pn,qty:aft,min:p.min,suggest:p.max-aft,loc:p.loc||'—',status:'PENDING',time:firebase.firestore.FieldValue.serverTimestamp()});
   document.getElementById('wT').style.display='flex';document.getElementById('wM').textContent='เบิกสำเร็จ — '+p.name+' -'+n+' ชิ้น (คงเหลือ '+aft+')';
@@ -169,17 +346,18 @@ window.doW=async function(){
 
 function rRec(){
   const o=parts.map(p=>'<option value="'+p.id+'">['+p.pn+'] '+p.name+' — เหลือ '+p.qty+'</option>').join('');
-  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">รับอะไหล่เข้าคลัง</div><div id="rT" class="toast success"><i class="ti ti-check"></i><span id="rM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput" id="rP"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่รับเข้า</label><input class="finput" type="number" id="rQ" min="1" value="10"><label class="flabel">PO / Ref.</label><input class="finput" type="text" id="rR" placeholder="PO-2025-XXX"><label class="flabel">ผู้รับ</label><input class="finput" type="text" id="rU" placeholder="ชื่อผู้รับ"><button class="btn btn-green" onclick="doR()"><i class="ti ti-arrow-down-circle"></i> ยืนยันรับเข้าคลัง</button></div></div></div>';
+  const defUser=currentUser.displayName||currentUser.username;
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">รับอะไหล่เข้าคลัง</div><div id="rT" class="toast success"><i class="ti ti-check"></i><span id="rM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput-sm" id="rP"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่รับเข้า</label><input class="finput-sm" type="number" id="rQ" min="1" value="10"><label class="flabel">PO / Ref.</label><input class="finput-sm" type="text" id="rR" placeholder="PO-2025-XXX"><label class="flabel">ผู้รับ</label><input class="finput-sm" type="text" id="rU" value="'+defUser+'" placeholder="ชื่อผู้รับ"><button class="btn btn-green" onclick="doR()"><i class="ti ti-arrow-down-circle"></i> ยืนยันรับเข้าคลัง</button></div></div></div>';
 }
 
 window.doR=async function(){
   const s=document.getElementById('rP'),o=s.options[s.selectedIndex];
   if(!o.value){alert('กรุณาเลือกอะไหล่');return;}
-  const n=parseInt(document.getElementById('rQ').value)||0,u=document.getElementById('rU').value||'ไม่ระบุ',r=document.getElementById('rR').value||'—';
+  const n=parseInt(document.getElementById('rQ').value)||0,u=document.getElementById('rU').value||currentUser.username,r=document.getElementById('rR').value||'—';
   if(n<=0){alert('จำนวนต้องมากกว่า 0');return;}
   const p=parts.find(x=>x.id===o.value),bef=p.qty,aft=bef+n;
   await db.collection('parts').doc(p.id).update({qty:aft});
-  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,action:'RECEIVE',change:n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
+  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,userId:currentUser.id,action:'RECEIVE',change:n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
   const ai=alerts.find(a=>a.pn===p.pn&&(a.status==='PENDING'||a.status==='ORDERED'));
   if(ai&&aft>p.min)await db.collection('alerts').doc(ai.id).update({status:'RESOLVED'});
   document.getElementById('rT').style.display='flex';document.getElementById('rM').textContent='รับเข้าสำเร็จ — '+p.name+' +'+n+' ชิ้น (คงเหลือ '+aft+')';
@@ -192,7 +370,7 @@ function rLog(){
 }
 
 function rAlerts(){
-  const r=alerts.map(a=>'<tr><td><div style="color:#f1f5f9;font-weight:600">'+a.part+'</div><div style="font-size:.65rem;color:#475569">'+a.pn+'</div></td><td style="color:#64748b">'+(a.loc||'—')+'</td><td style="color:#f87171;font-weight:700">'+a.qty+'</td><td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td><td><span class="badge '+(a.status==='PENDING'?'bP':a.status==='ORDERED'?'bA':'bR')+'">'+a.status+'</span></td><td>'+(a.status==='PENDING'?'<button class="btn btn-blue" style="width:auto;padding:4px 10px;font-size:.68rem" onclick="doAlt(\''+a.id+'\')"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>':'—')+'</td></tr>').join('');
+  const r=alerts.map(a=>'<tr><td><div style="color:#f1f5f9;font-weight:600">'+a.part+'</div><div style="font-size:.65rem;color:#475569">'+a.pn+'</div></td><td style="color:#64748b">'+(a.loc||'—')+'</td><td style="color:#f87171;font-weight:700">'+a.qty+'</td><td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td><td><span class="badge '+(a.status==='PENDING'?'bP':a.status==='ORDERED'?'bA':'bR')+'">'+a.status+'</span></td><td>'+(a.status==='PENDING'?'<button class="btn-sm blue" onclick="doAlt(\''+a.id+'\')"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>':'—')+'</td></tr>').join('');
   return '<div id="aT" class="toast success"><i class="ti ti-check"></i>อัปเดตสถานะแล้ว</div><div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Reorder Alerts</div><div class="card"><table class="t"><thead><tr><th>อะไหล่</th><th>ตำแหน่ง</th><th>Stock</th><th>ควรสั่ง</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'+(r||'<tr><td colspan="6" style="text-align:center;color:#4ade80;padding:20px">✅ Stock ปกติทุกรายการ</td></tr>')+'</tbody></table></div>';
 }
 
@@ -203,15 +381,10 @@ window.doAlt=async function(id){
   document.getElementById('aT').style.display='flex';
 }
 
-;(async function(){
-  try{
-    await seedIfEmpty();
-    await loadAll();
-    document.getElementById('pageContent').innerHTML=rDash();
-  }catch(e){
-    document.getElementById('pageContent').innerHTML='<div class="loading" style="color:#f87171">❌ Error: '+e.message+'<br><small>ตรวจสอบ Firestore Rules และ Config</small></div>';
-    console.error(e);
-  }
+// ---- INIT ----
+;(function(){
+  const saved=sessionStorage.getItem('egmUser');
+  if(saved){currentUser=JSON.parse(saved);showApp();}
 })();
 </script>
 </body>
