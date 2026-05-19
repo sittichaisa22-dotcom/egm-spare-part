@@ -182,6 +182,22 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+<!-- MODAL: Reset Password -->
+<div class="modal-overlay" id="modalResetPw">
+  <div class="modal">
+    <h3><i class="ti ti-key"></i> Reset Password</h3>
+    <p style="color:#94a3b8;font-size:.8rem;margin-bottom:16px">ตั้ง Password ใหม่ให้ <strong id="resetUserName" style="color:#f1f5f9"></strong></p>
+    <div class="login-err" id="resetErr"></div>
+    <input type="hidden" id="resetUserId">
+    <label class="flabel">Password ใหม่</label>
+    <input class="finput-sm" type="password" id="resetNewPw" placeholder="อย่างน้อย 6 ตัวอักษร">
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalResetPw')">ยกเลิก</button>
+      <button style="background:#2563eb" onclick="doResetPassword()">ยืนยัน Reset</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: เพิ่ม User -->
 <div class="modal-overlay" id="modalAddUser">
   <div class="modal">
