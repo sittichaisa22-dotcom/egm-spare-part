@@ -149,6 +149,36 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+
+<!-- MODAL: เพิ่ม/แก้ไข อะไหล่ -->
+<div class="modal-overlay" id="modalPart">
+  <div class="modal" style="max-width:420px;max-height:90vh;overflow-y:auto">
+    <h3 id="pmTitle"><i class="ti ti-box"></i> เพิ่มอะไหล่ใหม่</h3>
+    <div class="login-err" id="pmErr"></div>
+    <input type="hidden" id="pmId">
+    <label class="flabel">Part No.</label>
+    <input class="finput-sm" type="text" id="pmPn" placeholder="เช่น EL-001">
+    <label class="flabel">ชื่ออะไหล่</label>
+    <input class="finput-sm" type="text" id="pmName" placeholder="ชื่ออะไหล่">
+    <label class="flabel">หมวดหมู่</label>
+    <input class="finput-sm" type="text" id="pmCat" placeholder="เช่น Electric, Bearing">
+    <label class="flabel">จำนวน (Qty)</label>
+    <input class="finput-sm" type="number" id="pmQty" value="0" min="0">
+    <label class="flabel">Min Stock</label>
+    <input class="finput-sm" type="number" id="pmMin" value="0" min="0">
+    <label class="flabel">Max Stock</label>
+    <input class="finput-sm" type="number" id="pmMax" value="0" min="0">
+    <label class="flabel">ตำแหน่ง (Location)</label>
+    <input class="finput-sm" type="text" id="pmLoc" placeholder="เช่น A-01">
+    <label class="flabel">หมายเหตุ</label>
+    <input class="finput-sm" type="text" id="pmNote" placeholder="หมายเหตุ (ถ้ามี)">
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalPart')">ยกเลิก</button>
+      <button style="background:#2563eb" onclick="savePartModal()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: เพิ่ม User -->
 <div class="modal-overlay" id="modalAddUser">
   <div class="modal">
@@ -327,8 +357,58 @@ function rDash(){
 }
 
 function rParts(){
-  const r=parts.map(p=>'<tr><td style="color:#64748b;font-size:.68rem">'+p.pn+'</td><td style="color:#f1f5f9;font-weight:600">'+p.name+'</td><td><span class="badge bA">'+p.cat+'</span></td><td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td><td style="color:#64748b">'+p.min+'</td><td style="color:#64748b">'+p.max+'</td><td style="color:#64748b">'+(p.loc||'—')+'</td><td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำกว่า Min':'ปกติ')+'</span></td></tr>').join('');
-  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">รายการอะไหล่ทั้งหมด '+parts.length+' รายการ</div><div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่ออะไหล่</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>ตำแหน่ง</th><th>สถานะ</th></tr></thead><tbody>'+r+'</tbody></table></div>';
+  const isAdmin=currentUser.role==='admin';
+  const addBtn=isAdmin?'<button class="btn-sm blue" onclick="openPartModal()"><i class="ti ti-plus"></i> เพิ่มอะไหล่</button>':'';
+  const r=parts.map(p=>{
+    const actionCol=isAdmin?'<td style="white-space:nowrap"><button class="btn-sm blue" style="margin-right:4px" onclick="openPartModal(\''+p.id+'\')"><i class="ti ti-edit"></i></button><button class="btn-sm red" onclick="deletePart(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\')"><i class="ti ti-trash"></i></button></td>':'';
+    const actionTh=isAdmin?'<th></th>':'';
+    return '<tr><td style="color:#64748b;font-size:.68rem">'+p.pn+'</td><td style="color:#f1f5f9;font-weight:600">'+p.name+'</td><td><span class="badge bA">'+p.cat+'</span></td><td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td><td style="color:#64748b">'+p.min+'</td><td style="color:#64748b">'+p.max+'</td><td style="color:#64748b">'+(p.loc||'—')+'</td><td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำกว่า Min':'ปกติ')+'</span></td>'+actionCol+'</tr>';
+  }).join('');
+  const actionTh=isAdmin?'<th></th>':'';
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:.95rem;font-weight:700">รายการอะไหล่ทั้งหมด '+parts.length+' รายการ</div>'+addBtn+'</div><div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่ออะไหล่</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>ตำแหน่ง</th><th>สถานะ</th>'+actionTh+'</tr></thead><tbody>'+r+'</tbody></table></div>';
+}
+
+window.openPartModal=function(id){
+  const p=id?parts.find(x=>x.id===id):null;
+  document.getElementById('pmTitle').textContent=p?'แก้ไขอะไหล่':'เพิ่มอะไหล่ใหม่';
+  document.getElementById('pmId').value=id||'';
+  document.getElementById('pmPn').value=p?p.pn:'';
+  document.getElementById('pmName').value=p?p.name:'';
+  document.getElementById('pmCat').value=p?p.cat:'';
+  document.getElementById('pmQty').value=p?p.qty:0;
+  document.getElementById('pmMin').value=p?p.min:0;
+  document.getElementById('pmMax').value=p?p.max:0;
+  document.getElementById('pmLoc').value=p?p.loc||'':'';
+  document.getElementById('pmNote').value=p?p.note||'':'';
+  document.getElementById('pmErr').style.display='none';
+  openModal('modalPart');
+}
+
+window.savePartModal=async function(){
+  const id=document.getElementById('pmId').value;
+  const pn=document.getElementById('pmPn').value.trim();
+  const name=document.getElementById('pmName').value.trim();
+  const cat=document.getElementById('pmCat').value.trim();
+  const qty=parseInt(document.getElementById('pmQty').value)||0;
+  const min=parseInt(document.getElementById('pmMin').value)||0;
+  const max=parseInt(document.getElementById('pmMax').value)||0;
+  const loc=document.getElementById('pmLoc').value.trim();
+  const note=document.getElementById('pmNote').value.trim();
+  const err=document.getElementById('pmErr');
+  if(!pn||!name){err.textContent='กรุณากรอก Part No. และชื่ออะไหล่';err.style.display='block';return;}
+  const data={pn,name,cat,qty,min,max,loc,note,brand:''};
+  if(id){await db.collection('parts').doc(id).update(data);}
+  else{await db.collection('parts').add(data);}
+  closeModal('modalPart');
+  await loadAll();
+  nav('parts',document.querySelector('.sb-link.active'));
+}
+
+window.deletePart=async function(id,name){
+  if(!confirm('ลบ "'+name+'" ออกจากระบบ?'))return;
+  await db.collection('parts').doc(id).delete();
+  await loadAll();
+  nav('parts',document.querySelector('.sb-link.active'));
 }
 
 function rWith(){
