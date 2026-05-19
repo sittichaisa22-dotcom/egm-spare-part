@@ -24,7 +24,15 @@ body{background:#0f1724;font-family:'Segoe UI',sans-serif;color:#f1f5f9}
 /* APP */
 .app{display:none;height:100vh;overflow:hidden;flex-direction:row}
 .app.show{display:flex}
-.sidebar{width:210px;background:#151f2e;border-right:1px solid #1e2d42;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar{width:220px;background:#151f2e;border-right:1px solid #1e2d42;display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s ease;z-index:50}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
+.sb-overlay.show{display:block}
+.hamburger{display:none;background:none;border:none;color:#f1f5f9;font-size:1.3rem;cursor:pointer;padding:4px 6px}
+@media(max-width:768px){
+  .hamburger{display:flex;align-items:center}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+}
 .sb-brand{padding:16px;border-bottom:1px solid #1e2d42;font-size:.82rem;font-weight:700;color:#2563eb}
 .sb-brand span{color:#64748b;font-weight:400;font-size:.7rem;display:block;margin-top:2px}
 .sb-sec{font-size:.62rem;font-weight:700;letter-spacing:.1em;color:#475569;padding:14px 14px 4px;text-transform:uppercase}
@@ -112,7 +120,8 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 
 <!-- APP -->
 <div class="app" id="appPage">
-  <div class="sidebar">
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar">
     <div class="sb-brand"><i class="ti ti-packages"></i> EGM Spare Part<span>Inventory System v2.0</span></div>
     <div class="sb-sec">ภาพรวม</div>
     <div class="sb-link active" onclick="nav('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
@@ -132,6 +141,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   </div>
   <div class="main">
     <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
       <div class="title" id="pageTitle"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
       <div class="user-pill"><span class="dot"></span><span id="topUserName">—</span><span class="role-badge" id="topRoleBadge"></span></div>
     </div>
@@ -170,6 +180,16 @@ firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
 let parts=[],logs=[],alerts=[],currentUser=null;
+
+// ---- SIDEBAR MOBILE ----
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('show');
+}
 
 // ---- AUTH ----
 function hashPass(p){let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0;}return h.toString(36);}
@@ -288,6 +308,7 @@ async function loadAlerts(){
 async function loadAll(){await Promise.all([loadParts(),loadLogs(),loadAlerts()])}
 
 window.nav=async function(page,el){
+  closeSidebar();
   document.querySelectorAll('.sb-link').forEach(x=>x.classList.remove('active'));
   if(el)el.classList.add('active');
   document.getElementById('pageContent').innerHTML='<div class="loading">กำลังโหลด...</div>';
