@@ -608,13 +608,13 @@ window.doAlt=async function(pn){
   const saved=sessionStorage.getItem('egmUser');
   if(saved){currentUser=JSON.parse(saved);showApp();}
 })();
-</script>
-</body>
-</html>
 window.undoAlt=async function(pn,id){
   if(!id)return;
   await db.collection('alerts').doc(id).update({status:'PENDING'});
   await loadAll();
   document.getElementById('pageContent').innerHTML=rAlerts();
 }
+</script>
+</body>
+</html>
 
