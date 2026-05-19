@@ -366,11 +366,65 @@ window.nav=async function(page,el){
 }
 
 function rDash(){
-  const t=parts.length,low=parts.filter(p=>p.qty<=p.min).length,out=parts.filter(p=>p.qty===0).length,ok=parts.filter(p=>p.qty>p.min).length;
-  const ah=low>0?'<div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);color:#f87171;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle"></i> มีอะไหล่ '+low+' รายการที่ Stock ต่ำกว่า Min</div>':'';
-  const pr=parts.slice(0,6).map(p=>'<tr><td style="color:#64748b;font-size:.68rem">'+p.pn+'</td><td style="color:#f1f5f9">'+p.name+'</td><td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำ':'OK')+'</span></td><td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td><td><div class="bar-wrap"><div class="bar-fill" style="width:'+pct(p.qty,p.max)+'%;background:'+sc(p.qty,p.min)+'"></div></div></td></tr>').join('');
-  const lr=logs.slice(0,5).map(l=>'<tr><td style="color:#475569;font-size:.65rem">'+ft(l.time)+'</td><td style="color:#f1f5f9">'+(l.partName||'—')+'</td><td style="color:#94a3b8">'+(l.user||'—')+'</td><td>'+ba(l.action)+'</td><td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td><td style="color:#f1f5f9">'+l.after+'</td></tr>').join('');
-  return ah+'<div class="stat-grid"><div class="stat blue"><div class="stat-lbl">Part ทั้งหมด</div><div class="stat-val">'+t+'</div></div><div class="stat green"><div class="stat-lbl">Stock ปกติ</div><div class="stat-val">'+ok+'</div></div><div class="stat amber"><div class="stat-lbl">Stock ต่ำ</div><div class="stat-val">'+low+'</div></div><div class="stat red"><div class="stat-lbl">หมด Stock</div><div class="stat-val">'+out+'</div></div></div><div class="row2"><div class="card"><div class="card-hd"><i class="ti ti-box"></i> Stock Overview</div><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ</th><th>สถานะ</th><th>Qty</th><th>Level</th></tr></thead><tbody>'+pr+'</tbody></table></div><div class="card"><div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th></tr></thead><tbody>'+(lr||'<tr><td colspan="6" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
+  const t=parts.length,low=parts.filter(p=>p.qty<=p.min&&p.qty>0).length,out=parts.filter(p=>p.qty===0).length,ok=parts.filter(p=>p.qty>p.min).length;
+
+  // Alert banner
+  const totalBad=low+out;
+  const ah=totalBad>0
+    ?'<div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);color:#f87171;border-radius:8px;padding:10px 14px;font-size:.8rem;margin-bottom:14px;display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle" style="font-size:1rem"></i><span>มีอะไหล่ <strong>'+totalBad+'</strong> รายการต้องดูแล (หมด '+out+', ต่ำ '+low+')</span></div>'
+    :'<div style="background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:#4ade80;border-radius:8px;padding:10px 14px;font-size:.8rem;margin-bottom:14px;display:flex;align-items:center;gap:8px"><i class="ti ti-circle-check"></i> Stock ปกติทุกรายการ</div>';
+
+  // KPI cards — 2x2 grid บนมือถือ
+  const kpi='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'
+    +'<div class="stat blue"><div class="stat-lbl">Part ทั้งหมด</div><div class="stat-val">'+t+'</div></div>'
+    +'<div class="stat green"><div class="stat-lbl">Stock ปกติ</div><div class="stat-val">'+ok+'</div></div>'
+    +'<div class="stat amber"><div class="stat-lbl">Stock ต่ำ</div><div class="stat-val">'+low+'</div></div>'
+    +'<div class="stat red"><div class="stat-lbl">หมด Stock</div><div class="stat-val">'+out+'</div></div>'
+    +'</div>';
+
+  // รายการที่ต้องดูแล (หมดและต่ำ) — เรียง หมดก่อน
+  const urgentParts=[
+    ...parts.filter(p=>p.qty===0),
+    ...parts.filter(p=>p.qty>0&&p.qty<=p.min)
+  ].slice(0,8);
+
+  const urgentRows=urgentParts.length>0
+    ? urgentParts.map(p=>'<tr>'
+        +'<td style="color:#64748b;font-size:.65rem">'+p.pn+'</td>'
+        +'<td><div style="color:#f1f5f9;font-size:.78rem;font-weight:600">'+p.name+'</div>'
+        +(p.model?'<div style="color:#475569;font-size:.62rem">'+p.model+'</div>':'')+'</td>'
+        +'<td><span class="badge '+(p.qty===0?'bW':'bP')+'">'+(p.qty===0?'หมด':'ต่ำ')+'</span></td>'
+        +'<td style="color:'+(p.qty===0?'#f87171':'#fbbf24')+';font-weight:700">'+p.qty+'</td>'
+        +'<td style="color:#64748b">'+p.min+'</td>'
+        +'</tr>').join('')
+    :'<tr><td colspan="5" style="text-align:center;color:#4ade80;padding:16px">✅ ไม่มีรายการเร่งด่วน</td></tr>';
+
+  const urgentCard='<div class="card" style="margin-bottom:12px">'
+    +'<div class="card-hd" style="justify-content:space-between"><span><i class="ti ti-alert-circle"></i> รายการเร่งด่วน</span>'
+    +(totalBad>8?'<span style="color:#475569;font-size:.65rem">แสดง 8/'+totalBad+'</span>':'')
+    +'</div>'
+    +'<table class="t"><thead><tr><th>No.</th><th>ชื่ออะไหล่</th><th>สถานะ</th><th>Qty</th><th>Min</th></tr></thead>'
+    +'<tbody>'+urgentRows+'</tbody></table></div>';
+
+  // ประวัติล่าสุด
+  const lr=logs.length>0
+    ? logs.slice(0,6).map(l=>'<div style="padding:10px 12px;border-bottom:1px solid #1e2d42;display:flex;justify-content:space-between;align-items:center">'
+        +'<div>'
+        +'<div style="color:#f1f5f9;font-size:.78rem;font-weight:600">'+(l.partName||'—')+'</div>'
+        +'<div style="color:#475569;font-size:.65rem">'+ft(l.time)+' · '+(l.user||'—')+'</div>'
+        +'</div>'
+        +'<div style="text-align:right">'
+        +ba(l.action)
+        +'<div style="font-weight:700;font-size:.82rem;color:'+(l.change<0?'#f87171':'#4ade80')+';margin-top:2px">'+(l.change>0?'+':'')+l.change+' → '+l.after+'</div>'
+        +'</div>'
+        +'</div>').join('')
+    :'<div style="text-align:center;color:#475569;padding:20px;font-size:.8rem">ยังไม่มีประวัติการเบิก/รับ</div>';
+
+  const logCard='<div class="card">'
+    +'<div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div>'
+    +lr+'</div>';
+
+  return ah+kpi+urgentCard+logCard;
 }
 
 function rParts(q){
