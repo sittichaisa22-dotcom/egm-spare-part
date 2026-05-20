@@ -551,21 +551,7 @@ window.deletePart=async function(id,name){
   nav('parts',document.querySelector('.sb-link.active'));
 }
 
-window.openPartModal=function(id){
-  const p=id?parts.find(x=>x.id===id):null;
-  document.getElementById('pmTitle').textContent=p?'แก้ไขอะไหล่':'เพิ่มอะไหล่ใหม่';
-  document.getElementById('pmId').value=id||'';
-  document.getElementById('pmPn').value=p?p.pn:'';
-  document.getElementById('pmName').value=p?p.name:'';
-  document.getElementById('pmCat').value=p?p.cat:'';
-  document.getElementById('pmQty').value=p?p.qty:0;
-  document.getElementById('pmMin').value=p?p.min:0;
-  document.getElementById('pmMax').value=p?p.max:0;
-  document.getElementById('pmLoc').value=p?p.loc||'':'';
-  document.getElementById('pmNote').value=p?p.note||'':'';
-  document.getElementById('pmErr').style.display='none';
-  openModal('modalPart');
-}
+
 
 window.savePartModal=async function(){
   const id=document.getElementById('pmId').value;
