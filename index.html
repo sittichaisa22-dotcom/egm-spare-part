@@ -379,6 +379,8 @@ window.nav=async function(page,el){
   document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users'}[page]||page;
   if(page==='users'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rUsers();return;}
   document.getElementById('pageContent').innerHTML={dashboard:rDash,parts:rParts,withdraw:rWith,receive:rRec,log:rLog,alerts:rAlerts}[page]();
+  if(page==='withdraw'&&document.getElementById('wP'))wFilter('');
+  if(page==='receive'&&document.getElementById('rP'))rFilter('');
 }
 
 function rDash(){
@@ -452,9 +454,8 @@ function rParts(q){
     const safeId=p.id;
     const searchTxt=((p.name||'')+'|'+(p.pn||'')+'|'+(p.model||'')+'|'+(p.cat||'')).toLowerCase();
     return '<tr '+clickRow+'data-id="'+safeId+'" data-search="'+searchTxt.replace(/"/g,'&quot;')+'">'
-      +'<td style="color:#64748b;font-size:.68rem">'+p.pn+'</td>'
-      +'<td><div style="color:#f1f5f9;font-weight:600;font-size:.78rem">'+p.name+'</div>'
-      +(p.model?'<div style="color:#475569;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
+      +'<td><div style="color:#f1f5f9;font-weight:600;font-size:.8rem">'+p.name+'</div>'
+      +(p.model?'<div style="color:#94a3b8;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
       +'<td><span class="badge bA">'+p.cat+'</span></td>'
       +'<td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td>'
       +'<td style="color:#64748b">'+p.min+'</td>'
@@ -472,7 +473,7 @@ function rParts(q){
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div>'+addBtn+'</div>'
     +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
-    +'<div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
+    +'<div class="card"><table class="t"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
     +'<tr id="partsEmpty" style="display:none"><td colspan="7" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
     +'</tbody></table></div>';
@@ -581,9 +582,56 @@ window.deletePart=async function(id,name){
 }
 
 function rWith(){
-  const o=parts.map(p=>'<option value="'+p.id+'" data-qty="'+p.qty+'" data-min="'+p.min+'" data-name="'+p.name+'">['+p.pn+'] '+p.name+' — เหลือ '+p.qty+'</option>').join('');
   const defUser=currentUser.displayName||currentUser.username;
-  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div><div style="font-size:.72rem;color:#64748b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div><div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div><div id="wE" class="toast error"><i class="ti ti-alert-circle"></i><span id="wEM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลเบิก</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput-sm" id="wP" onchange="wPrev()"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่เบิก</label><input class="finput-sm" type="number" id="wQ" min="1" value="1" oninput="wPrev()"><label class="flabel">Work Order / Ref.</label><input class="finput-sm" type="text" id="wR" placeholder="WO-2025-XXX"><label class="flabel">ผู้เบิก</label><input class="finput-sm" type="text" id="wU" value="'+defUser+'" placeholder="ชื่อผู้เบิก"><div class="preview-box" id="wPB" style="opacity:.4"><div class="preview-row"><span class="pl">อะไหล่</span><span class="pv" id="pN">—</span></div><div class="preview-row"><span class="pl">เบิกออก</span><span class="pv" id="pO">—</span></div><div class="preview-row"><span class="pl">Stock ก่อน</span><span class="pv" id="pB">—</span></div><div class="preview-row"><span class="pl">Stock หลัง</span><span class="pv" id="pA">—</span></div></div><button class="btn btn-red" onclick="doW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button></div></div></div>';
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div>'
+    +'<div style="font-size:.72rem;color:#64748b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div>'
+    +'<div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div>'
+    +'<div id="wE" class="toast error"><i class="ti ti-alert-circle"></i><span id="wEM"></span></div>'
+    +'<div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลเบิก</div><div class="pform">'
+    +'<label class="flabel">ค้นหาอะไหล่</label>'
+    +'<div style="position:relative;margin-bottom:6px">'
+    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569"></i>'
+    +'<input class="finput-sm" type="text" id="wSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="wFilter(this.value)">'
+    +'</div>'
+    +'<label class="flabel">เลือกอะไหล่</label>'
+    +'<select class="finput-sm" id="wP" onchange="wPrev()" size="1"><option value="">-- เลือก --</option></select>'
+    +'<div id="wPartInfo" style="display:none;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;color:#94a3b8"></div>'
+    +'<label class="flabel">จำนวนที่เบิก</label>'
+    +'<input class="finput-sm" type="number" id="wQ" min="1" value="1" oninput="wPrev()">'
+    +'<label class="flabel">Work Order / Ref.</label>'
+    +'<input class="finput-sm" type="text" id="wR" placeholder="WO-2025-XXX">'
+    +'<label class="flabel">ผู้เบิก</label>'
+    +'<input class="finput-sm" type="text" id="wU" value="'+defUser+'" placeholder="ชื่อผู้เบิก">'
+    +'<div class="preview-box" id="wPB" style="opacity:.4">'
+    +'<div class="preview-row"><span class="pl">อะไหล่</span><span class="pv" id="pN">—</span></div>'
+    +'<div class="preview-row"><span class="pl">เบิกออก</span><span class="pv" id="pO">—</span></div>'
+    +'<div class="preview-row"><span class="pl">Stock ก่อน</span><span class="pv" id="pB">—</span></div>'
+    +'<div class="preview-row"><span class="pl">Stock หลัง</span><span class="pv" id="pA">—</span></div>'
+    +'</div>'
+    +'<button class="btn btn-red" onclick="doW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button>'
+    +'</div></div></div>';
+}
+
+window.wFilter=function(val){
+  const kw=val.toLowerCase().trim();
+  const sel=document.getElementById('wP');
+  sel.innerHTML='<option value="">-- เลือก --</option>';
+  const filtered=kw?parts.filter(p=>
+    (p.name||'').toLowerCase().includes(kw)||
+    (p.model||'').toLowerCase().includes(kw)||
+    (p.pn||'').toLowerCase().includes(kw)
+  ):parts;
+  filtered.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    opt.dataset.qty=p.qty;
+    opt.dataset.min=p.min;
+    opt.dataset.name=p.name;
+    opt.textContent=p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty;
+    sel.appendChild(opt);
+  });
+  document.getElementById('wPartInfo').style.display='none';
+  document.getElementById('wPB').style.opacity='.4';
 }
 
 window.wPrev=function(){
@@ -615,9 +663,42 @@ window.doW=async function(){
 }
 
 function rRec(){
-  const o=parts.map(p=>'<option value="'+p.id+'">['+p.pn+'] '+p.name+' — เหลือ '+p.qty+'</option>').join('');
   const defUser=currentUser.displayName||currentUser.username;
-  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">รับอะไหล่เข้าคลัง</div><div id="rT" class="toast success"><i class="ti ti-check"></i><span id="rM"></span></div><div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform"><label class="flabel">เลือกอะไหล่</label><select class="finput-sm" id="rP"><option value="">-- เลือก --</option>'+o+'</select><label class="flabel">จำนวนที่รับเข้า</label><input class="finput-sm" type="number" id="rQ" min="1" value="10"><label class="flabel">PO / Ref.</label><input class="finput-sm" type="text" id="rR" placeholder="PO-2025-XXX"><label class="flabel">ผู้รับ</label><input class="finput-sm" type="text" id="rU" value="'+defUser+'" placeholder="ชื่อผู้รับ"><button class="btn btn-green" onclick="doR()"><i class="ti ti-arrow-down-circle"></i> ยืนยันรับเข้าคลัง</button></div></div></div>';
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">รับอะไหล่เข้าคลัง</div>'
+    +'<div id="rT" class="toast success"><i class="ti ti-check"></i><span id="rM"></span></div>'
+    +'<div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform">'
+    +'<label class="flabel">ค้นหาอะไหล่</label>'
+    +'<div style="position:relative;margin-bottom:6px">'
+    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569"></i>'
+    +'<input class="finput-sm" type="text" id="rSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="rFilter(this.value)">'
+    +'</div>'
+    +'<label class="flabel">เลือกอะไหล่</label>'
+    +'<select class="finput-sm" id="rP"><option value="">-- เลือก --</option></select>'
+    +'<label class="flabel">จำนวนที่รับเข้า</label>'
+    +'<input class="finput-sm" type="number" id="rQ" min="1" value="10">'
+    +'<label class="flabel">PO / Ref.</label>'
+    +'<input class="finput-sm" type="text" id="rR" placeholder="PO-2025-XXX">'
+    +'<label class="flabel">ผู้รับ</label>'
+    +'<input class="finput-sm" type="text" id="rU" value="'+defUser+'" placeholder="ชื่อผู้รับ">'
+    +'<button class="btn btn-green" onclick="doR()"><i class="ti ti-arrow-down-circle"></i> ยืนยันรับเข้าคลัง</button>'
+    +'</div></div></div>';
+}
+
+window.rFilter=function(val){
+  const kw=val.toLowerCase().trim();
+  const sel=document.getElementById('rP');
+  sel.innerHTML='<option value="">-- เลือก --</option>';
+  const filtered=kw?parts.filter(p=>
+    (p.name||'').toLowerCase().includes(kw)||
+    (p.model||'').toLowerCase().includes(kw)||
+    (p.pn||'').toLowerCase().includes(kw)
+  ):parts;
+  filtered.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    opt.textContent=p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty;
+    sel.appendChild(opt);
+  });
 }
 
 window.doR=async function(){
