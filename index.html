@@ -471,7 +471,7 @@ function rParts(q){
     +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569;font-size:.9rem"></i>'
     +'<input id="partSearch" class="finput-sm" type="text" placeholder="ค้นหาชื่อ, Part No., Model, หมวด..." '
     +'style="padding-left:32px;margin-bottom:0" value="'+(kw||'')+'" '
-    +'oninput="filterParts(this.value)">'
+    +'onkeyup="filterParts(this.value)" onchange="filterParts(this.value)">'
     +'</div>';
   const countTxt=kw?'พบ '+filtered.length+' รายการ (จาก '+parts.length+')':'รายการอะไหล่ทั้งหมด '+parts.length+' รายการ';
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div>'+addBtn+'</div>'
@@ -483,16 +483,17 @@ function rParts(q){
 }
 
 window.filterParts=function(val){
+  const pos=document.getElementById('partSearch')?document.getElementById('partSearch').selectionStart:0;
   document.getElementById('pageContent').innerHTML=rParts(val);
   const el=document.getElementById('partSearch');
-  if(el){el.focus();el.setSelectionRange(val.length,val.length);}
+  if(el){el.focus();try{el.setSelectionRange(val.length,val.length);}catch(e){}}
 }
 
 window.openPartModal=function(id,event){
   if(event)event.stopPropagation();
   const p=id?parts.find(x=>x.id===id):null;
   document.getElementById('pmTitle').textContent=p?'แก้ไขอะไหล่':'เพิ่มอะไหล่ใหม่';
-  document.getElementById('pmId').value=id||'';
+  document.getElementById('pmId').value=p?p.id:'';
   document.getElementById('pmPn').value=p?p.pn:'';
   document.getElementById('pmName').value=p?p.name:'';
   document.getElementById('pmModel').value=p?p.model||'':'';
