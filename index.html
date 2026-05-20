@@ -379,8 +379,10 @@ window.nav=async function(page,el){
   document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users'}[page]||page;
   if(page==='users'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rUsers();return;}
   document.getElementById('pageContent').innerHTML={dashboard:rDash,parts:rParts,withdraw:rWith,receive:rRec,log:rLog,alerts:rAlerts}[page]();
-  if(page==='withdraw'&&document.getElementById('wP'))wFilter('');
-  if(page==='receive'&&document.getElementById('rP'))rFilter('');
+  setTimeout(function(){
+    if(page==='withdraw'&&document.getElementById('wP'))wFilter('');
+    if(page==='receive'&&document.getElementById('rP'))rFilter('');
+  },50);
 }
 
 function rDash(){
@@ -408,9 +410,8 @@ function rDash(){
 
   const urgentRows=urgentParts.length>0
     ? urgentParts.map(p=>'<tr>'
-        +'<td style="color:#64748b;font-size:.65rem">'+p.pn+'</td>'
         +'<td><div style="color:#f1f5f9;font-size:.78rem;font-weight:600">'+p.name+'</div>'
-        +(p.model?'<div style="color:#475569;font-size:.62rem">'+p.model+'</div>':'')+'</td>'
+        +(p.model?'<div style="color:#94a3b8;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
         +'<td><span class="badge '+(p.qty===0?'bW':'bP')+'">'+(p.qty===0?'หมด':'ต่ำ')+'</span></td>'
         +'<td style="color:'+(p.qty===0?'#f87171':'#fbbf24')+';font-weight:700">'+p.qty+'</td>'
         +'<td style="color:#64748b">'+p.min+'</td>'
@@ -421,7 +422,7 @@ function rDash(){
     +'<div class="card-hd" style="justify-content:space-between"><span><i class="ti ti-alert-circle"></i> รายการเร่งด่วน</span>'
     +(totalBad>8?'<span style="color:#475569;font-size:.65rem">แสดง 8/'+totalBad+'</span>':'')
     +'</div>'
-    +'<table class="t"><thead><tr><th>No.</th><th>ชื่ออะไหล่</th><th>สถานะ</th><th>Qty</th><th>Min</th></tr></thead>'
+    +'<table class="t"><thead><tr><th>ชื่ออะไหล่</th><th>สถานะ</th><th>Qty</th><th>Min</th></tr></thead>'
     +'<tbody>'+urgentRows+'</tbody></table></div>';
 
   // ประวัติล่าสุด
