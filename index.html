@@ -447,16 +447,11 @@ function rParts(q){
   const isAdmin=currentUser.role==='admin';
   const addBtn=isAdmin?'<button class="btn-sm blue" onclick="openPartModal(null,event)"><i class="ti ti-plus"></i> เพิ่มอะไหล่</button>':'';
   const clickRow=isAdmin?'style="cursor:pointer" onclick="openPartModal(this.dataset.id,event)" ':'';
-  const kw=(q||'').toLowerCase().trim();
-  const filtered=kw?parts.filter(p=>
-    (p.name||'').toLowerCase().includes(kw)||
-    (p.pn||'').toLowerCase().includes(kw)||
-    (p.model||'').toLowerCase().includes(kw)||
-    (p.cat||'').toLowerCase().includes(kw)
-  ):parts;
+  const filtered=parts;
   const r=filtered.map(p=>{
     const safeId=p.id;
-    return '<tr '+clickRow+'data-id="'+safeId+'">'
+    const searchTxt=((p.name||'')+'|'+(p.pn||'')+'|'+(p.model||'')+'|'+(p.cat||'')).toLowerCase();
+    return '<tr '+clickRow+'data-id="'+safeId+'" data-search="'+searchTxt.replace(/"/g,'&quot;')+'">'
       +'<td style="color:#64748b;font-size:.68rem">'+p.pn+'</td>'
       +'<td><div style="color:#f1f5f9;font-weight:600;font-size:.78rem">'+p.name+'</div>'
       +(p.model?'<div style="color:#475569;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
@@ -470,23 +465,33 @@ function rParts(q){
   const searchBar='<div style="position:relative;margin-bottom:10px">'
     +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569;font-size:.9rem"></i>'
     +'<input id="partSearch" class="finput-sm" type="text" placeholder="ค้นหาชื่อ, Part No., Model, หมวด..." '
-    +'style="padding-left:32px;margin-bottom:0" value="'+(kw||'')+'" '
-    +'onkeyup="filterParts(this.value)" onchange="filterParts(this.value)">'
+    +'style="padding-left:32px;margin-bottom:0" '
+    +'oninput="filterPartsLive(this.value)">'
     +'</div>';
-  const countTxt=kw?'พบ '+filtered.length+' รายการ (จาก '+parts.length+')':'รายการอะไหล่ทั้งหมด '+parts.length+' รายการ';
+  const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#475569;font-size:.75rem"></span>';
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div>'+addBtn+'</div>'
     +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
-    +'<div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>สถานะ</th></tr></thead><tbody>'
-    +(r||'<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>')
+    +'<div class="card"><table class="t"><thead><tr><th>Part No.</th><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min</th><th>Max</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
+    +r
+    +'<tr id="partsEmpty" style="display:none"><td colspan="7" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
     +'</tbody></table></div>';
 }
 
-window.filterParts=function(val){
-  const pos=document.getElementById('partSearch')?document.getElementById('partSearch').selectionStart:0;
-  document.getElementById('pageContent').innerHTML=rParts(val);
-  const el=document.getElementById('partSearch');
-  if(el){el.focus();try{el.setSelectionRange(val.length,val.length);}catch(e){}}
+window.filterPartsLive=function(val){
+  const kw=val.toLowerCase().trim();
+  const rows=document.querySelectorAll('#partsTableBody tr');
+  let shown=0;
+  rows.forEach(function(tr){
+    const txt=tr.dataset.search||'';
+    const match=!kw||txt.includes(kw);
+    tr.style.display=match?'':'none';
+    if(match)shown++;
+  });
+  const cnt=document.getElementById('partCount');
+  if(cnt)cnt.textContent=kw?'(พบ '+shown+' รายการ)':'';
+  const empty=document.getElementById('partsEmpty');
+  if(empty)empty.style.display=shown===0?'':'none';
 }
 
 window.openPartModal=function(id,event){
