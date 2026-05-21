@@ -135,6 +135,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <div class="sb-sec admin-only" style="display:none">Admin</div>
     <div class="sb-link admin-only" style="display:none" onclick="nav('users',this)"><i class="ti ti-users"></i>จัดการ Users</div>
     <div class="sb-link admin-only" style="display:none" onclick="nav('categories',this)"><i class="ti ti-tag"></i>จัดการหมวดหมู่</div>
+    <div class="sb-link admin-only" style="display:none" onclick="nav('loginlog',this)"><i class="ti ti-login"></i>Log การ Login</div>
     <div class="sb-bottom">
       <div style="font-size:.68rem;color:#475569;margin-bottom:8px;text-align:center" id="sideUserInfo"></div>
       <button class="btn-logout" style="background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.2);color:#60a5fa;margin-bottom:6px" onclick="openModal('modalChangePw')"><i class="ti ti-key"></i> เปลี่ยน Password</button>
@@ -282,6 +283,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
@@ -332,6 +334,8 @@ async function doLogin(){
     if(ud.disabled){err.textContent='บัญชีนี้ถูกระงับการใช้งาน';err.style.display='block';return;}
     currentUser={id:doc.id,...ud};
     sessionStorage.setItem('egmUser',JSON.stringify(currentUser));
+    // บันทึก login log
+    db.collection('loginLogs').add({userId:currentUser.id,username:currentUser.username,displayName:currentUser.displayName||currentUser.username,role:currentUser.role,time:firebase.firestore.FieldValue.serverTimestamp(),device:navigator.userAgent.substring(0,100)});
     showApp();
   }catch(e){err.textContent='เกิดข้อผิดพลาด: '+e.message;err.style.display='block';}
 }
@@ -378,6 +382,21 @@ async function seedAdmin(){
 }
 
 // ---- USERS PAGE (Admin only) ----
+
+
+async function rLoginLog(){
+  const snap=await db.collection('loginLogs').orderBy('time','desc').limit(100).get();
+  const loginlogs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const rows=loginlogs.map(l=>'<tr>'
+    +'<td style="color:#475569;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
+    +'<td style="color:#f1f5f9;font-weight:600">'+(l.displayName||l.username||'—')+'</td>'
+    +'<td style="color:#94a3b8">'+(l.username||'—')+'</td>'
+    +'<td><span class="badge '+(l.role==='admin'?'bA':'bR')+'">'+(l.role==='admin'?'Admin':'User')+'</span></td>'
+    +'</tr>').join('');
+  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Log การ Login ('+loginlogs.length+' รายการล่าสุด)</div>'
+    +'<div class="card"><table class="t"><thead><tr><th>เวลา</th><th>ชื่อ</th><th>Username</th><th>Role</th></tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div>';
+}
 
 async function rCategories(){
   const snap=await db.collection('categories').orderBy('name').get();
@@ -502,9 +521,10 @@ window.nav=async function(page,el){
   if(el)el.classList.add('active');
   document.getElementById('pageContent').innerHTML='<div class="loading">กำลังโหลด...</div>';
   if(page!=='users')await loadAll();
-  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users',categories:'จัดการหมวดหมู่'}[page]||page;
+  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users',categories:'จัดการหมวดหมู่',loginlog:'Log การ Login'}[page]||page;
   if(page==='users'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rUsers();return;}
   if(page==='categories'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rCategories();return;}
+  if(page==='loginlog'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rLoginLog();return;}
   document.getElementById('pageContent').innerHTML={dashboard:rDash,parts:rParts,withdraw:rWith,receive:rRec,log:rLog,alerts:rAlerts}[page]();
 
 }
@@ -567,7 +587,7 @@ function rDash(){
     +'<div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div>'
     +lr+'</div>';
 
-  return ah+kpi+urgentCard+logCard;
+  return ah+kpi+chartCard+urgentCard+logCard;
 }
 
 function rParts(q){
@@ -594,13 +614,44 @@ function rParts(q){
     +'oninput="filterPartsLive(this.value)">'
     +'</div>';
   const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#475569;font-size:.75rem"></span>';
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div>'+addBtn+'</div>'
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px"><button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
     +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
     +'<div class="card"><table class="t"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
     +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
     +'</tbody></table></div>';
+}
+
+
+
+window.filterLog=function(val){
+  document.getElementById('pageContent').innerHTML=rLog(val||null);
+}
+
+window.exportLog=function(){
+  if(!logs.length){alert('ไม่มีข้อมูลให้ Export');return;}
+  const rows=[['เวลา','อะไหล่','ผู้ทำ','Action','จำนวน','ก่อน','หลัง','Ref.']];
+  logs.forEach(l=>{
+    const d=l.time&&l.time.toDate?l.time.toDate():new Date();
+    rows.push([d.toLocaleString('th-TH'),l.partName||'',l.user||'',l.action,l.change,l.before,l.after,l.ref||'']);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:20},{wch:30},{wch:15},{wch:12},{wch:10},{wch:10},{wch:10},{wch:15}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Stock Log',ws);
+  XLSX.writeFile(wb,'EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+window.exportParts=function(){
+  if(!parts.length){alert('ไม่มีข้อมูล');return;}
+  const rows=[['ชื่ออะไหล่','Part Model','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ']];
+  parts.forEach(p=>rows.push([p.name,p.model||'',p.cat||'',p.qty,p.min,p.max,p.loc||'',p.note||'']));
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Parts',ws);
+  XLSX.writeFile(wb,'EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 window.filterPartsLive=function(val){
@@ -863,9 +914,30 @@ window.doR=async function(){
   s.value='';await loadAll();
 }
 
-function rLog(){
-  const r=logs.map(l=>'<tr><td style="color:#475569;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td><td style="color:#f1f5f9">'+(l.partName||'—')+'</td><td style="color:#94a3b8">'+(l.user||'—')+'</td><td>'+ba(l.action)+'</td><td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td><td style="color:#64748b">'+l.before+'</td><td style="color:#f1f5f9">'+l.after+'</td><td style="color:#475569;font-size:.65rem">'+(l.ref||'—')+'</td></tr>').join('');
-  return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">ประวัติการเคลื่อนไหว Stock</div><div class="card"><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>ก่อน</th><th>หลัง</th><th>Ref.</th></tr></thead><tbody>'+(r||'<tr><td colspan="8" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div>';
+function rLog(filterUser){
+  const users=[...new Set(logs.map(l=>l.user||'—'))].sort();
+  const userOpts=users.map(u=>'<option value="'+u+'"'+(filterUser===u?' selected':'')+'>'+u+'</option>').join('');
+  const filtered=filterUser?logs.filter(l=>(l.user||'—')===filterUser):logs;
+  const r=filtered.map(l=>'<tr>'
+    +'<td style="color:#475569;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
+    +'<td style="color:#f1f5f9;font-size:.78rem">'+(l.partName||'—')+'</td>'
+    +'<td style="color:#94a3b8;font-size:.72rem">'+(l.user||'—')+'</td>'
+    +'<td>'+ba(l.action)+'</td>'
+    +'<td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td>'
+    +'<td style="color:#f1f5f9">'+l.after+'</td>'
+    +'<td style="color:#475569;font-size:.65rem">'+(l.ref||'—')+'</td>'
+    +'</tr>').join('');
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="font-size:.95rem;font-weight:700">ประวัติ Stock</div>'
+    +'<button class="btn-sm blue" onclick="exportLog()"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">'
+    +'<label style="font-size:.72rem;color:#64748b;white-space:nowrap">กรองตาม User:</label>'
+    +'<select class="finput-sm" style="margin:0;flex:1" onchange="filterLog(this.value)">'
+    +'<option value="">ทั้งหมด</option>'+userOpts
+    +'</select></div>'
+    +'<div class="card"><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th><th>Ref.</th></tr></thead>'
+    +'<tbody>'+(r||'<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div>';
 }
 
 function rAlerts(){
