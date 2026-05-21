@@ -156,8 +156,6 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <h3 id="pmTitle"><i class="ti ti-box"></i> เพิ่มอะไหล่ใหม่</h3>
     <div class="login-err" id="pmErr"></div>
     <input type="hidden" id="pmId">
-    <label class="flabel">Part No.</label>
-    <input class="finput-sm" type="text" id="pmPn" placeholder="เช่น EL-001">
     <label class="flabel">ชื่ออะไหล่</label>
     <input class="finput-sm" type="text" id="pmName" placeholder="ชื่ออะไหล่">
     <label class="flabel">Part Model</label>
@@ -497,7 +495,6 @@ window.openPartModal=function(id,event){
   const p=id?parts.find(x=>x.id===id):null;
   document.getElementById('pmTitle').textContent=p?'แก้ไขอะไหล่':'เพิ่มอะไหล่ใหม่';
   document.getElementById('pmId').value=p?p.id:'';
-  document.getElementById('pmPn').value=p?p.pn:'';
   document.getElementById('pmName').value=p?p.name:'';
   document.getElementById('pmModel').value=p?p.model||'':'';
   document.getElementById('pmCat').value=p?p.cat:'';
@@ -513,7 +510,7 @@ window.openPartModal=function(id,event){
 
 window.savePartModal=async function(){
   const id=document.getElementById('pmId').value;
-  const pn=document.getElementById('pmPn').value.trim();
+  const pn='';
   const name=document.getElementById('pmName').value.trim();
   const model=document.getElementById('pmModel').value.trim();
   const cat=document.getElementById('pmCat').value.trim();
@@ -523,7 +520,7 @@ window.savePartModal=async function(){
   const loc=document.getElementById('pmLoc').value.trim();
   const note=document.getElementById('pmNote').value.trim();
   const err=document.getElementById('pmErr');
-  if(!pn||!name){err.textContent='กรุณากรอก Part No. และชื่ออะไหล่';err.style.display='block';return;}
+  if(!name){err.textContent='กรุณากรอกชื่ออะไหล่';err.style.display='block';return;}
   const data={pn,name,model,cat,qty,min,max,loc,note,brand:''};
   if(id){await db.collection('parts').doc(id).update(data);}
   else{await db.collection('parts').add(data);}
@@ -553,7 +550,7 @@ window.deletePart=async function(id,name){
 
 window.savePartModal=async function(){
   const id=document.getElementById('pmId').value;
-  const pn=document.getElementById('pmPn').value.trim();
+  const pn='';
   const name=document.getElementById('pmName').value.trim();
   const cat=document.getElementById('pmCat').value.trim();
   const qty=parseInt(document.getElementById('pmQty').value)||0;
@@ -562,7 +559,7 @@ window.savePartModal=async function(){
   const loc=document.getElementById('pmLoc').value.trim();
   const note=document.getElementById('pmNote').value.trim();
   const err=document.getElementById('pmErr');
-  if(!pn||!name){err.textContent='กรุณากรอก Part No. และชื่ออะไหล่';err.style.display='block';return;}
+  if(!name){err.textContent='กรุณากรอกชื่ออะไหล่';err.style.display='block';return;}
   const data={pn,name,cat,qty,min,max,loc,note,brand:''};
   if(id){await db.collection('parts').doc(id).update(data);}
   else{await db.collection('parts').add(data);}
