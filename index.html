@@ -134,8 +134,10 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <div class="sb-link" onclick="nav('alerts',this)"><i class="ti ti-bell"></i>Reorder Alerts<span class="sb-badge" id="alertBadge"></span></div>
     <div class="sb-sec admin-only" style="display:none">Admin</div>
     <div class="sb-link admin-only" style="display:none" onclick="nav('users',this)"><i class="ti ti-users"></i>จัดการ Users</div>
+    <div class="sb-link admin-only" style="display:none" onclick="nav('categories',this)"><i class="ti ti-tag"></i>จัดการหมวดหมู่</div>
     <div class="sb-bottom">
       <div style="font-size:.68rem;color:#475569;margin-bottom:8px;text-align:center" id="sideUserInfo"></div>
+      <button class="btn-logout" style="background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.2);color:#60a5fa;margin-bottom:6px" onclick="openModal('modalChangePw')"><i class="ti ti-key"></i> เปลี่ยน Password</button>
       <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> ออกจากระบบ</button>
     </div>
   </div>
@@ -161,7 +163,24 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <label class="flabel">Part Model</label>
     <input class="finput-sm" type="text" id="pmModel" placeholder="เช่น A97L-0201-0735">
     <label class="flabel">หมวดหมู่</label>
-    <input class="finput-sm" type="text" id="pmCat" placeholder="เช่น Electric, Bearing">
+    <select class="finput-sm" id="pmCat">
+      <option value="">-- เลือกหมวดหมู่ --</option>
+      <option value="Bearing">Bearing</option>
+      <option value="Belt & Chain">Belt & Chain</option>
+      <option value="Ball Screw">Ball Screw</option>
+      <option value="CNC">CNC</option>
+      <option value="Cover">Cover</option>
+      <option value="Electric">Electric</option>
+      <option value="Fastener">Fastener</option>
+      <option value="Gear">Gear</option>
+      <option value="Hydraulic">Hydraulic</option>
+      <option value="Misc">Misc</option>
+      <option value="Motor">Motor</option>
+      <option value="Pneumatics">Pneumatics</option>
+      <option value="Sensor">Sensor</option>
+      <option value="Tools">Tools</option>
+      <option value="Other">Other</option>
+    </select>
     <label class="flabel">จำนวน (Qty)</label>
     <input class="finput-sm" type="number" id="pmQty" value="0" min="0">
     <label class="flabel">Min Stock</label>
@@ -176,6 +195,50 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalPart')">ยกเลิก</button>
       <button style="background:#2563eb" onclick="savePartModal()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: เพิ่มหมวดหมู่ -->
+<div class="modal-overlay" id="modalAddCat">
+  <div class="modal">
+    <h3><i class="ti ti-tag"></i> เพิ่มหมวดหมู่ใหม่</h3>
+    <div class="login-err" id="addCatErr"></div>
+    <label class="flabel">ชื่อหมวดหมู่</label>
+    <input class="finput-sm" type="text" id="newCatName" placeholder="เช่น Hydraulic, Sensor">
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalAddCat')">ยกเลิก</button>
+      <button style="background:#2563eb" onclick="doAddCat()">เพิ่ม</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ยืนยันเบิก -->
+<div class="modal-overlay" id="modalConfirmW">
+  <div class="modal">
+    <h3><i class="ti ti-alert-triangle" style="color:#f87171"></i> ยืนยันการเบิก</h3>
+    <div id="confirmWDetail" style="background:#0f1724;border:1px solid #1e2d42;border-radius:8px;padding:12px;margin-bottom:16px;font-size:.82rem"></div>
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalConfirmW')">ยกเลิก</button>
+      <button style="background:#dc2626" onclick="confirmDoW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: เปลี่ยน Password -->
+<div class="modal-overlay" id="modalChangePw">
+  <div class="modal">
+    <h3><i class="ti ti-key"></i> เปลี่ยน Password</h3>
+    <div class="login-err" id="changePwErr"></div>
+    <label class="flabel">Password ปัจจุบัน</label>
+    <input class="finput-sm" type="password" id="cpOld" placeholder="Password เดิม">
+    <label class="flabel">Password ใหม่</label>
+    <input class="finput-sm" type="password" id="cpNew" placeholder="อย่างน้อย 6 ตัวอักษร">
+    <label class="flabel">ยืนยัน Password ใหม่</label>
+    <input class="finput-sm" type="password" id="cpConfirm" placeholder="พิมพ์ซ้ำอีกครั้ง">
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalChangePw')">ยกเลิก</button>
+      <button style="background:#2563eb" onclick="doChangePw()">บันทึก</button>
     </div>
   </div>
 </div>
@@ -226,7 +289,21 @@ const firebaseConfig={apiKey:"AIzaSyBYPu_pV-KmuVo4otitNWoeIWyhD0sMuMo",authDomai
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-let parts=[],logs=[],alerts=[],currentUser=null;
+let parts=[],logs=[],alerts=[],categories=[],currentUser=null;
+
+
+// ---- AUTO LOGOUT (30 นาที) ----
+var _autoLogoutTimer;
+function resetAutoLogout(){
+  clearTimeout(_autoLogoutTimer);
+  _autoLogoutTimer=setTimeout(function(){
+    alert('หมดเวลาใช้งาน กรุณา login ใหม่');
+    doLogout();
+  }, 30*60*1000);
+}
+['click','keydown','touchstart','scroll'].forEach(function(e){
+  document.addEventListener(e, resetAutoLogout, true);
+});
 
 // ---- SIDEBAR MOBILE ----
 function toggleSidebar(){
@@ -280,6 +357,7 @@ function showApp(){
   rb.className='role-badge '+(isAdmin?'role-admin':'role-user');
   document.getElementById('sideUserInfo').textContent=(currentUser.displayName||currentUser.username);
   initApp();
+  resetAutoLogout();
 }
 
 async function initApp(){
@@ -300,6 +378,41 @@ async function seedAdmin(){
 }
 
 // ---- USERS PAGE (Admin only) ----
+
+async function rCategories(){
+  const snap=await db.collection('categories').orderBy('name').get();
+  categories=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const rows=categories.map(c=>'<tr>'
+    +'<td style="color:#f1f5f9;font-weight:600">'+c.name+'</td>'
+    +'<td style="white-space:nowrap"><button class="btn-sm red" onclick="deleteCat(\''+c.id+'\',\''+c.name+'\')"><i class="ti ti-trash"></i> ลบ</button></td>'
+    +'</tr>').join('');
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="font-size:.95rem;font-weight:700">จัดการหมวดหมู่ ('+categories.length+' หมวด)</div>'
+    +'<button class="btn-sm blue" onclick="openModal(\'modalAddCat\')"><i class="ti ti-plus"></i> เพิ่มหมวด</button>'
+    +'</div>'
+    +'<div class="admin-card"><table class="t"><thead><tr><th>ชื่อหมวดหมู่</th><th>ดำเนินการ</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table></div>';
+}
+
+window.deleteCat=async function(id,name){
+  if(!confirm('ลบหมวดหมู่ "'+name+'" ?'))return;
+  await db.collection('categories').doc(id).delete();
+  nav('categories',document.querySelector('.sb-link.active'));
+}
+
+window.doAddCat=async function(){
+  const name=document.getElementById('newCatName').value.trim();
+  const err=document.getElementById('addCatErr');
+  err.style.display='none';
+  if(!name){err.textContent='กรุณากรอกชื่อหมวดหมู่';err.style.display='block';return;}
+  const exists=categories.find(c=>c.name.toLowerCase()===name.toLowerCase());
+  if(exists){err.textContent='มีหมวดหมู่นี้อยู่แล้ว';err.style.display='block';return;}
+  await db.collection('categories').add({name,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  closeModal('modalAddCat');
+  document.getElementById('newCatName').value='';
+  nav('categories',document.querySelector('.sb-link.active'));
+}
+
 async function rUsers(){
   const snap=await db.collection('users').get();
   const users=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -366,7 +479,22 @@ async function loadAlerts(){
   const badge=document.getElementById('alertBadge');
   if(badge)badge.textContent=cnt||'';
 }
-async function loadAll(){await Promise.all([loadParts(),loadLogs(),loadAlerts()])}
+async function loadCategories(){
+  const snap=await db.collection('categories').orderBy('name').get();
+  if(snap.empty){
+    // seed default categories ถ้ายังไม่มี
+    const defaults=['Bearing','Belt & Chain','Ball Screw','CNC','Cover','Electric','Fastener','Gear','Hydraulic','Misc','Motor','Pneumatics','Sensor','Tools','Other'];
+    for(const name of defaults){
+      await db.collection('categories').add({name,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+    const snap2=await db.collection('categories').orderBy('name').get();
+    categories=snap2.docs.map(d=>({id:d.id,...d.data()}));
+  } else {
+    categories=snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
+}
+
+async function loadAll(){await Promise.all([loadParts(),loadLogs(),loadAlerts(),loadCategories()])}
 
 window.nav=async function(page,el){
   closeSidebar();
@@ -374,8 +502,9 @@ window.nav=async function(page,el){
   if(el)el.classList.add('active');
   document.getElementById('pageContent').innerHTML='<div class="loading">กำลังโหลด...</div>';
   if(page!=='users')await loadAll();
-  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users'}[page]||page;
+  document.getElementById('pageTitle').innerHTML={dashboard:'Dashboard',parts:'รายการอะไหล่',withdraw:'เบิกอะไหล่',receive:'รับอะไหล่เข้า',log:'ประวัติ Stock',alerts:'Reorder Alerts',users:'จัดการ Users',categories:'จัดการหมวดหมู่'}[page]||page;
   if(page==='users'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rUsers();return;}
+  if(page==='categories'&&currentUser.role==='admin'){document.getElementById('pageContent').innerHTML=await rCategories();return;}
   document.getElementById('pageContent').innerHTML={dashboard:rDash,parts:rParts,withdraw:rWith,receive:rRec,log:rLog,alerts:rAlerts}[page]();
 
 }
@@ -493,11 +622,13 @@ window.filterPartsLive=function(val){
 window.openPartModal=function(id,event){
   if(event)event.stopPropagation();
   const p=id?parts.find(x=>x.id===id):null;
+  // populate categories
+  const catSel=document.getElementById('pmCat');
+  catSel.innerHTML='<option value="">-- เลือกหมวดหมู่ --</option>'+categories.map(c=>'<option value="'+c.name+'"'+(p&&p.cat===c.name?' selected':'')+'>'+c.name+'</option>').join('');
   document.getElementById('pmTitle').textContent=p?'แก้ไขอะไหล่':'เพิ่มอะไหล่ใหม่';
   document.getElementById('pmId').value=p?p.id:'';
   document.getElementById('pmName').value=p?p.name:'';
   document.getElementById('pmModel').value=p?p.model||'':'';
-  document.getElementById('pmCat').value=p?p.cat:'';
   document.getElementById('pmQty').value=p?p.qty:0;
   document.getElementById('pmMin').value=p?p.min:0;
   document.getElementById('pmMax').value=p?p.max:0;
@@ -639,7 +770,8 @@ window.wPrev=function(){
   document.getElementById('wPB').style.opacity='1';
 }
 
-window.doW=async function(){
+var _pendingW=null;
+window.doW=function(){
   const s=document.getElementById('wP'),o=s.options[s.selectedIndex];
   document.getElementById('wE').style.display='none';document.getElementById('wT').style.display='none';
   if(!o.value){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='กรุณาเลือกอะไหล่';return;}
@@ -647,13 +779,34 @@ window.doW=async function(){
   const p=parts.find(x=>x.id===o.value);
   if(n<=0){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='จำนวนต้องมากกว่า 0';return;}
   if(n>p.qty){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='Stock ไม่พอ — มีแค่ '+p.qty+' ชิ้น';return;}
+  _pendingW={p,n,u,r};
+  const aft=p.qty-n;
+  document.getElementById('confirmWDetail').innerHTML=
+    '<div style="color:#94a3b8;margin-bottom:8px">รายละเอียดการเบิก</div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">อะไหล่</span><span style="color:#f1f5f9;font-weight:600">'+p.name+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">จำนวนเบิก</span><span style="color:#f87171;font-weight:700">-'+n+' ชิ้น</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">Stock หลังเบิก</span><span style="color:'+(aft<=p.min?'#f87171':'#4ade80')+';font-weight:700">'+aft+' ชิ้น</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">ผู้เบิก</span><span style="color:#f1f5f9">'+u+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:#64748b">Ref.</span><span style="color:#f1f5f9">'+r+'</span></div>'
+    +(aft<=p.min?'<div style="margin-top:8px;color:#fbbf24;font-size:.75rem"><i class="ti ti-alert-triangle"></i> Stock จะต่ำกว่า Min หลังเบิก</div>':'');
+  openModal('modalConfirmW');
+}
+
+window.confirmDoW=async function(){
+  if(!_pendingW)return;
+  const {p,n,u,r}=_pendingW;
+  _pendingW=null;
+  closeModal('modalConfirmW');
   const bef=p.qty,aft=bef-n;
   await db.collection('parts').doc(p.id).update({qty:aft});
-  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,userId:currentUser.id,action:'WITHDRAW',change:-n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
+  await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn||'',user:u,userId:currentUser.id,action:'WITHDRAW',change:-n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
   if(aft<=p.min&&!alerts.find(a=>a.pn===p.pn&&a.status==='PENDING'))
-    await db.collection('alerts').add({partId:p.id,part:p.name,pn:p.pn,qty:aft,min:p.min,suggest:p.max-aft,loc:p.loc||'—',status:'PENDING',time:firebase.firestore.FieldValue.serverTimestamp()});
-  document.getElementById('wT').style.display='flex';document.getElementById('wM').textContent='เบิกสำเร็จ — '+p.name+' -'+n+' ชิ้น (คงเหลือ '+aft+')';
-  s.value='';document.getElementById('wPB').style.opacity='.4';await loadAll();
+    await db.collection('alerts').add({partId:p.id,part:p.name,pn:p.pn||'',qty:aft,min:p.min,suggest:p.max-aft,loc:p.loc||'—',status:'PENDING',time:firebase.firestore.FieldValue.serverTimestamp()});
+  document.getElementById('wT').style.display='flex';
+  document.getElementById('wM').textContent='เบิกสำเร็จ — '+p.name+' -'+n+' ชิ้น (คงเหลือ '+aft+')';
+  document.getElementById('wP').value='';
+  document.getElementById('wPB').style.opacity='.4';
+  await loadAll();
 }
 
 function rRec(){
