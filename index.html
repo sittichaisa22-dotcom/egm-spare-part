@@ -394,8 +394,8 @@ async function rLoginLog(){
     +'<td><span class="badge '+(l.role==='admin'?'bA':'bR')+'">'+(l.role==='admin'?'Admin':'User')+'</span></td>'
     +'</tr>').join('');
   return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Log การ Login ('+loginlogs.length+' รายการล่าสุด)</div>'
-    +'<div class="card"><table class="t"><thead><tr><th>เวลา</th><th>ชื่อ</th><th>Username</th><th>Role</th></tr></thead>'
-    +'<tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div>';
+    +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:400px"><thead><tr><th>เวลา</th><th>ชื่อ</th><th>Username</th><th>Role</th></tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
 }
 
 async function rCategories(){
@@ -630,10 +630,10 @@ function rParts(q){
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px"><button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
     +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
-    +'<div class="card"><table class="t"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
+    +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:360px"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
     +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
-    +'</tbody></table></div>';
+    +'</tbody></table></div></div>';
 }
 
 
@@ -949,8 +949,8 @@ function rLog(filterUser){
     +'<select class="finput-sm" style="margin:0;flex:1" onchange="filterLog(this.value)">'
     +'<option value="">ทั้งหมด</option>'+userOpts
     +'</select></div>'
-    +'<div class="card"><table class="t"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th><th>Ref.</th></tr></thead>'
-    +'<tbody>'+(r||'<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div>';
+    +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:520px"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th><th>Ref.</th></tr></thead>'
+    +'<tbody>'+(r||'<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
 }
 
 function rAlerts(){
