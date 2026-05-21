@@ -214,6 +214,17 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+<!-- MODAL: ดูรายละเอียดอะไหล่ -->
+<div class="modal-overlay" id="modalViewPart">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 id="vpTitle" style="margin:0;font-size:.95rem"></h3>
+      <button onclick="closeModal('modalViewPart')" style="background:none;border:none;color:#475569;font-size:1.2rem;cursor:pointer"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="vpBody"></div>
+  </div>
+</div>
+
 <!-- MODAL: Import Parts -->
 <div class="modal-overlay" id="modalImport">
   <div class="modal" style="max-width:440px">
@@ -638,7 +649,7 @@ function rDash(){
 function rParts(q){
   const isAdmin=currentUser.role==='admin';
   const addBtn=isAdmin?'<button class="btn-sm blue" onclick="openPartModal(null,event)"><i class="ti ti-plus"></i> เพิ่มอะไหล่</button>':'';
-  const clickRow=isAdmin?'style="cursor:pointer" onclick="openPartModal(this.dataset.id,event)" ':'';
+  const clickRow='style="cursor:pointer" onclick="viewPart(this.dataset.id)" ';
   const filtered=parts;
   const r=filtered.map(p=>{
     const safeId=p.id;
@@ -661,7 +672,7 @@ function rParts(q){
   const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#475569;font-size:.75rem"></span>';
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px">'+(isAdmin?'<button class="btn-sm green" onclick="openModal(\'modalImport\')" ><i class="ti ti-file-upload"></i> Import</button>':'')+'<button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
     +searchBar
-    +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
+    '<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่รายการเพื่อดูรายละเอียด</div>'
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:360px"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
     +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
@@ -826,6 +837,48 @@ window.filterPartsLive=function(val){
   if(cnt)cnt.textContent=kw?'(พบ '+shown+' รายการ)':'';
   const empty=document.getElementById('partsEmpty');
   if(empty)empty.style.display=shown===0?'':'none';
+}
+
+
+
+window.editFromView=function(btn){
+  const id=btn.dataset.id;
+  closeModal('modalViewPart');
+  setTimeout(function(){openPartModal(id,null);},200);
+}
+window.deleteFromView=function(btn){
+  const id=btn.dataset.id,name=btn.dataset.name;
+  closeModal('modalViewPart');
+  setTimeout(function(){deletePart(id,name);},200);
+}
+
+window.viewPart=function(id){
+  const p=parts.find(x=>x.id===id);
+  if(!p)return;
+  const isAdmin=currentUser.role==='admin';
+  const statusBadge=p.qty===0?'<span class="badge bW">หมด Stock</span>':p.qty<=p.min?'<span class="badge bP">Stock ต่ำ</span>':'<span class="badge bR">ปกติ</span>';
+  const pct=p.max>0?Math.min(100,Math.round(p.qty/p.max*100)):0;
+  const barColor=p.qty===0?'#dc2626':p.qty<=p.min?'#f59e0b':'#22c55e';
+  document.getElementById('vpTitle').textContent=p.name;
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div>'+statusBadge+'</div><div style="font-size:.72rem;color:#475569">'+(p.cat||'—')+'</div></div>';
+  html+='<div style="background:#1e2d42;border-radius:8px;padding:12px;margin-bottom:12px">';
+  html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.72rem;color:#64748b">Stock คงเหลือ</span><span style="font-size:1.2rem;font-weight:800;color:'+barColor+'">'+p.qty+'</span></div>';
+  html+='<div style="background:#0f1724;border-radius:4px;height:8px;margin-bottom:6px"><div style="background:'+barColor+';height:100%;border-radius:4px;width:'+pct+'%"></div></div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:.65rem;color:#475569"><span>Min: '+p.min+'</span><span>Max: '+p.max+'</span></div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
+  var fields=[['Part Model',p.model||'—'],['Brand',p.brand||'—'],['ตำแหน่ง',p.loc||'—'],['หมายเหตุ',p.note||'—']];
+  fields.forEach(function(f){
+    html+='<div style="background:#1e2d42;border-radius:6px;padding:8px"><div style="font-size:.62rem;color:#475569;margin-bottom:2px">'+f[0]+'</div><div style="font-size:.78rem;color:#f1f5f9;font-weight:600">'+f[1]+'</div></div>';
+  });
+  html+='</div>';
+  if(isAdmin){
+    html+='<div style="display:flex;gap:8px">';
+    html+='<button class="btn btn-blue" style="margin:0" onclick="editFromView(this)" data-id="'+id+'"><i class="ti ti-edit"></i> แก้ไข</button>';
+    html+='<button class="btn btn-red" style="margin:0;flex:0 0 auto;width:auto;padding:8px 16px" onclick="deleteFromView(this)" data-id="'+id+'" data-name="'+p.name.replace(/"/g,'')+'"><i class="ti ti-trash"></i></button>';
+    html+='</div>';
+  }
+  document.getElementById('vpBody').innerHTML=html;
+  openModal('modalViewPart');
 }
 
 window.openPartModal=function(id,event){
