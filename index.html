@@ -891,6 +891,7 @@ window.openPartModal=function(id,event){
   document.getElementById('pmId').value=p?p.id:'';
   document.getElementById('pmName').value=p?p.name:'';
   document.getElementById('pmModel').value=p?p.model||'':'';
+  document.getElementById('pmBrand').value=p?p.brand||'':'';
   document.getElementById('pmQty').value=p?p.qty:0;
   document.getElementById('pmMin').value=p?p.min:0;
   document.getElementById('pmMax').value=p?p.max:0;
@@ -906,6 +907,7 @@ window.savePartModal=async function(){
   const pn='';
   const name=document.getElementById('pmName').value.trim();
   const model=document.getElementById('pmModel').value.trim();
+  const brand=document.getElementById('pmBrand').value.trim();
   const cat=document.getElementById('pmCat').value.trim();
   const qty=parseInt(document.getElementById('pmQty').value)||0;
   const min=parseInt(document.getElementById('pmMin').value)||0;
@@ -914,7 +916,7 @@ window.savePartModal=async function(){
   const note=document.getElementById('pmNote').value.trim();
   const err=document.getElementById('pmErr');
   if(!name){err.textContent='กรุณากรอกชื่ออะไหล่';err.style.display='block';return;}
-  const data={pn,name,model,cat,qty,min,max,loc,note,brand:''};
+  const data={pn,name,model,brand,cat,qty,min,max,loc,note};
   if(id){await db.collection('parts').doc(id).update(data);}
   else{await db.collection('parts').add(data);}
   closeModal('modalPart');
