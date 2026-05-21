@@ -214,6 +214,38 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+<!-- MODAL: Import Parts -->
+<div class="modal-overlay" id="modalImport">
+  <div class="modal" style="max-width:440px">
+    <h3><i class="ti ti-file-upload"></i> Import อะไหล่จาก Excel</h3>
+    <div style="background:#0f1724;border:1px solid #1e2d42;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.75rem;color:#94a3b8">
+      <div style="color:#f1f5f9;font-weight:600;margin-bottom:6px">📋 รูปแบบ Excel ที่รองรับ</div>
+      <div>คอลัมน์ตามลำดับ:</div>
+      <div style="color:#60a5fa;margin:4px 0">ชื่ออะไหล่ | Part Model | หมวดหมู่ | Qty | Min | Max | ตำแหน่ง | หมายเหตุ</div>
+      <div style="color:#475569;font-size:.68rem">* บรรทัดแรกเป็น header จะถูกข้ามอัตโนมัติ</div>
+    </div>
+    <button class="btn btn-blue" style="margin-bottom:10px" onclick="downloadTemplate()"><i class="ti ti-download"></i> ดาวน์โหลด Template</button>
+    <label class="flabel">เลือกไฟล์ Excel</label>
+    <input type="file" id="importFile" accept=".xlsx,.xls" class="finput-sm" style="padding:6px">
+    <div style="margin:10px 0">
+      <label style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:#94a3b8;cursor:pointer">
+        <input type="checkbox" id="importReplace" style="width:16px;height:16px">
+        <span>ลบข้อมูลเดิมทั้งหมดก่อน Import (ถ้าไม่เลือก จะเพิ่มต่อจากของเดิม)</span>
+      </label>
+    </div>
+    <div id="importPreview" style="display:none;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:10px;margin-bottom:10px;font-size:.75rem;max-height:150px;overflow-y:auto"></div>
+    <div class="login-err" id="importErr"></div>
+    <div id="importProgress" style="display:none;margin-bottom:10px">
+      <div style="font-size:.75rem;color:#94a3b8;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
+      <div style="background:#1e2d42;border-radius:4px;height:6px"><div id="importProgressBar" style="background:#2563eb;height:100%;border-radius:4px;width:0%;transition:width .3s"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button style="background:#374151" onclick="closeModal('modalImport');resetImport()">ยกเลิก</button>
+      <button style="background:#2563eb" id="importBtn" onclick="doImport()"><i class="ti ti-upload"></i> Import</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: ยืนยันเบิก -->
 <div class="modal-overlay" id="modalConfirmW">
   <div class="modal">
@@ -627,7 +659,7 @@ function rParts(q){
     +'oninput="filterPartsLive(this.value)">'
     +'</div>';
   const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#475569;font-size:.75rem"></span>';
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px"><button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px">'+(isAdmin?'<button class="btn-sm green" onclick="openModal(\'modalImport\')" ><i class="ti ti-file-upload"></i> Import</button>':'')+'<button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
     +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:360px"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
@@ -665,6 +697,119 @@ window.exportParts=function(){
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Parts',ws);
   XLSX.writeFile(wb,'EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+
+// ---- IMPORT EXCEL ----
+window.downloadTemplate=function(){
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['ชื่ออะไหล่','Part Model','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ'],
+    ['BEARING 6205','6205-2RS','Bearing',10,2,20,'A-01','ตัวอย่างข้อมูล'],
+    ['AIR CYLINDER','CDQ2A20-15DMZ','Pneumatics',5,1,10,'B-02','']
+  ]);
+  ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Parts Template',ws);
+  XLSX.writeFile(wb,'EGM_Parts_Template.xlsx');
+}
+
+var _importData=[];
+
+document.addEventListener('change',function(e){
+  if(e.target.id!=='importFile')return;
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      // ข้าม header row แรก
+      _importData=rows.slice(1).filter(r=>r[0]&&String(r[0]).trim()).map(r=>({
+        name:String(r[0]||'').trim(),
+        model:String(r[1]||'').trim(),
+        cat:String(r[2]||'Other').trim(),
+        qty:parseInt(r[3])||0,
+        min:parseInt(r[4])||0,
+        max:parseInt(r[5])||0,
+        loc:String(r[6]||'').trim(),
+        note:String(r[7]||'').trim(),
+        pn:'',brand:''
+      }));
+      const prev=document.getElementById('importPreview');
+      prev.style.display='block';
+      prev.innerHTML='<div style="color:#4ade80;font-weight:600;margin-bottom:6px">✅ พบ '+_importData.length+' รายการ</div>'
+        +_importData.slice(0,5).map(p=>'<div style="color:#94a3b8;padding:2px 0;border-bottom:1px solid #1e2d42">'+p.name+(p.model?' ('+p.model+')':'')+'</div>').join('')
+        +(_importData.length>5?'<div style="color:#475569;font-size:.68rem">...และอีก '+(_importData.length-5)+' รายการ</div>':'');
+      document.getElementById('importErr').style.display='none';
+    }catch(err){
+      document.getElementById('importErr').textContent='อ่านไฟล์ไม่ได้: '+err.message;
+      document.getElementById('importErr').style.display='block';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+window.doImport=async function(){
+  if(!_importData.length){
+    document.getElementById('importErr').textContent='กรุณาเลือกไฟล์ก่อน';
+    document.getElementById('importErr').style.display='block';
+    return;
+  }
+  const replace=document.getElementById('importReplace').checked;
+  document.getElementById('importBtn').disabled=true;
+  document.getElementById('importProgress').style.display='block';
+  document.getElementById('importErr').style.display='none';
+
+  try{
+    // ลบของเดิมถ้าเลือก replace
+    if(replace){
+      document.getElementById('importProgressText').textContent='กำลังลบข้อมูลเดิม...';
+      const snap=await db.collection('parts').get();
+      const delBatch=db.batch();
+      snap.docs.forEach(d=>delBatch.delete(d.ref));
+      await delBatch.commit();
+    }
+
+    // Import ทีละ batch 400
+    const BATCH=400;
+    let done=0;
+    for(let i=0;i<_importData.length;i+=BATCH){
+      const chunk=_importData.slice(i,i+BATCH);
+      const batch=db.batch();
+      chunk.forEach(p=>{
+        const ref=db.collection('parts').doc();
+        batch.set(ref,p);
+      });
+      await batch.commit();
+      done+=chunk.length;
+      const pct=Math.round(done/_importData.length*100);
+      document.getElementById('importProgressBar').style.width=pct+'%';
+      document.getElementById('importProgressText').textContent='Import แล้ว '+done+'/'+_importData.length+' รายการ';
+    }
+
+    closeModal('modalImport');
+    resetImport();
+    await loadAll();
+    nav('parts',document.querySelector('.sb-link.active'));
+    alert('Import สำเร็จ '+_importData.length+' รายการ!');
+  }catch(err){
+    document.getElementById('importErr').textContent='เกิดข้อผิดพลาด: '+err.message;
+    document.getElementById('importErr').style.display='block';
+    document.getElementById('importBtn').disabled=false;
+  }
+}
+
+window.resetImport=function(){
+  _importData=[];
+  document.getElementById('importFile').value='';
+  document.getElementById('importPreview').style.display='none';
+  document.getElementById('importProgress').style.display='none';
+  document.getElementById('importProgressBar').style.width='0%';
+  document.getElementById('importBtn').disabled=false;
+  document.getElementById('importErr').style.display='none';
+  document.getElementById('importReplace').checked=false;
 }
 
 window.filterPartsLive=function(val){
