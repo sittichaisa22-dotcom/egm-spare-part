@@ -587,6 +587,19 @@ function rDash(){
     +'<div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div>'
     +lr+'</div>';
 
+  // กราฟ Top 5 หมวดหมู่ตาม Stock ต่ำ
+  const catCount={};
+  parts.filter(p=>p.qty<=p.min).forEach(p=>{const c=p.cat||'Other';catCount[c]=(catCount[c]||0)+1;});
+  const topCats=Object.entries(catCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxVal=topCats.length?topCats[0][1]:1;
+  const chartBars=topCats.map(([cat,cnt])=>'<div style="margin-bottom:10px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px"><span style="color:#94a3b8">'+cat+'</span><span style="color:#f87171;font-weight:700">'+cnt+' รายการ</span></div>'
+    +'<div style="background:#1e2d42;border-radius:4px;height:8px"><div style="background:#dc2626;height:100%;border-radius:4px;width:'+Math.round(cnt/maxVal*100)+'%"></div></div>'
+    +'</div>').join('');
+  const chartCard=topCats.length
+    ?'<div class="card" style="margin-bottom:12px"><div class="card-hd"><i class="ti ti-chart-bar"></i> หมวดที่ Stock ต่ำ (Top 5)</div><div style="padding:12px">'+chartBars+'</div></div>'
+    :'';
+
   return ah+kpi+chartCard+urgentCard+logCard;
 }
 
