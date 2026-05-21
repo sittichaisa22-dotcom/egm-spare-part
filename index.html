@@ -456,7 +456,7 @@ function rParts(q){
       +(p.model?'<div style="color:#94a3b8;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
       +'<td><span class="badge bA">'+p.cat+'</span></td>'
       +'<td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td>'
-      +'<td style="color:#64748b;font-size:.7rem">'+p.min+'/'+p.max+'</td>'
+      
       +'<td><span class="badge '+(p.qty===0?'bW':p.qty<=p.min?'bP':'bR')+'">'+(p.qty===0?'หมด':p.qty<=p.min?'ต่ำ':'OK')+'</span></td>'
       +'</tr>';
   }).join('');
@@ -470,9 +470,9 @@ function rParts(q){
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div>'+addBtn+'</div>'
     +searchBar
     +(isAdmin?'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่แถวเพื่อแก้ไข</div>':'')
-    +'<div class="card"><table class="t"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>Min/Max</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
+    +'<div class="card"><table class="t"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
-    +'<tr id="partsEmpty" style="display:none"><td colspan="5" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
+    +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
     +'</tbody></table></div>';
 }
 
