@@ -672,7 +672,7 @@ function rParts(q){
   const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#475569;font-size:.75rem"></span>';
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px">'+(isAdmin?'<button class="btn-sm green" onclick="openModal(\'modalImport\')" ><i class="ti ti-file-upload"></i> Import</button>':'')+'<button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
     +searchBar
-    '<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่รายการเพื่อดูรายละเอียด</div>'
+    +'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่รายการเพื่อดูรายละเอียด</div>'
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:360px"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
     +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
