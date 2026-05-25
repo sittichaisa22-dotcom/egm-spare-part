@@ -698,13 +698,13 @@ window.exportLog=function(){
   ws['!cols']=[{wch:20},{wch:30},{wch:15},{wch:12},{wch:10},{wch:10},{wch:10},{wch:15}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Stock Log',ws);
-  const wbout1=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const blob1=new Blob([wbout1],{type:'application/octet-stream'});
-  const url1=URL.createObjectURL(blob1);
+  const wbout1=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
   const a1=document.createElement('a');
-  a1.href=url1;a1.download='EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a1.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout1;
+  a1.download='EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a1.style.display='none';
   document.body.appendChild(a1);a1.click();
-  setTimeout(function(){document.body.removeChild(a1);URL.revokeObjectURL(url1);},1000);
+  setTimeout(function(){document.body.removeChild(a1);},500);
 }
 
 window.exportParts=function(){
@@ -715,33 +715,36 @@ window.exportParts=function(){
   ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Parts',ws);
-  const wbout2=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const blob2=new Blob([wbout2],{type:'application/octet-stream'});
-  const url2=URL.createObjectURL(blob2);
+  const wbout2=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
   const a2=document.createElement('a');
-  a2.href=url2;a2.download='EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a2.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout2;
+  a2.download='EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a2.style.display='none';
   document.body.appendChild(a2);a2.click();
-  setTimeout(function(){document.body.removeChild(a2);URL.revokeObjectURL(url2);},1000);
+  setTimeout(function(){document.body.removeChild(a2);},500);
 }
 
 
 // ---- IMPORT EXCEL ----
 window.downloadTemplate=function(){
-  const ws=XLSX.utils.aoa_to_sheet([
-    ['ชื่ออะไหล่','Part Model','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ'],
-    ['BEARING 6205','6205-2RS','Bearing',10,2,20,'A-01','ตัวอย่างข้อมูล'],
-    ['AIR CYLINDER','CDQ2A20-15DMZ','Pneumatics',5,1,10,'B-02','']
-  ]);
-  ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,'Parts Template',ws);
-  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const blob=new Blob([wbout],{type:'application/octet-stream'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='EGM_Parts_Template.xlsx';
-  document.body.appendChild(a);a.click();
-  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  try{
+    const ws=XLSX.utils.aoa_to_sheet([
+      ['ชื่ออะไหล่','Part Model','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ'],
+      ['BEARING 6205','6205-2RS','Bearing',10,2,20,'A-01','ตัวอย่างข้อมูล'],
+      ['AIR CYLINDER','CDQ2A20-15DMZ','Pneumatics',5,1,10,'B-02','']
+    ]);
+    ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,'Parts Template',ws);
+    const wbout=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+    const a=document.createElement('a');
+    a.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout;
+    a.download='EGM_Parts_Template.xlsx';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){document.body.removeChild(a);},500);
+  }catch(e){alert('เกิดข้อผิดพลาด: '+e.message);}
 }
 
 var _importData=[];
