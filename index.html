@@ -1077,7 +1077,6 @@ window.confirmDoW=async function(){
 
 function rRec(){
   const defUser=currentUser.displayName||currentUser.username;
-  const rOpts=parts.map(p=>'<option value="'+p.id+'">'+p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty+'</option>').join('');
   return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">รับอะไหล่เข้าคลัง</div>'
     +'<div id="rT" class="toast success"><i class="ti ti-check"></i><span id="rM"></span></div>'
     +'<div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform">'
@@ -1086,8 +1085,12 @@ function rRec(){
     +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#546e7a"></i>'
     +'<input class="finput-sm" type="text" id="rSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="rFilter(this.value)">'
     +'</div>'
-    +'<label class="flabel">เลือกอะไหล่</label>'
-    +'<select class="finput-sm" id="rP"><option value="">-- เลือก --</option>'+rOpts+'</select>'
+    +'<input type="hidden" id="rP" value="">'
+    +'<div id="rSelectedBox" style="display:none;background:#0d3d1a;border:1px solid #16a34a;border-radius:6px;padding:8px 12px;margin-bottom:10px;display:none;align-items:center;justify-content:space-between">'
+    +'<div><div id="rSelectedName" style="font-size:.8rem;font-weight:700;color:#4ade80"></div><div id="rSelectedSub" style="font-size:.68rem;color:#607d8b;margin-top:2px"></div></div>'
+    +'<button onclick="rClearSelect()" style="background:none;border:none;color:#546e7a;cursor:pointer;font-size:1rem;padding:2px 4px"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +'<div id="rResultList" style="margin-bottom:10px"></div>'
     +'<label class="flabel">จำนวนที่รับเข้า</label>'
     +'<input class="finput-sm" type="number" id="rQ" min="1" value="10">'
     +'<label class="flabel">PO / Ref.</label>'
@@ -1100,33 +1103,66 @@ function rRec(){
 
 window.rFilter=function(val){
   const kw=val.toLowerCase().trim();
-  const sel=document.getElementById('rP');
-  sel.innerHTML='<option value="">-- เลือก --</option>';
-  const filtered=kw?parts.filter(p=>
+  const list=document.getElementById('rResultList');
+  if(!list)return;
+  if(!kw){list.innerHTML='';return;}
+  const filtered=parts.filter(p=>
     (p.name||'').toLowerCase().includes(kw)||
     (p.model||'').toLowerCase().includes(kw)||
     (p.pn||'').toLowerCase().includes(kw)
-  ):parts;
-  filtered.forEach(p=>{
-    const opt=document.createElement('option');
-    opt.value=p.id;
-    opt.textContent=p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty;
-    sel.appendChild(opt);
-  });
+  ).slice(0,20);
+  if(!filtered.length){
+    list.innerHTML='<div style="text-align:center;padding:14px;color:#546e7a;font-size:.78rem;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px">ไม่พบอะไหล่ที่ค้นหา</div>';
+    return;
+  }
+  list.innerHTML=filtered.map(p=>{
+    const stockColor=p.qty===0?'#f87171':p.qty<=p.min?'#fbbf24':'#4ade80';
+    const stockLabel=p.qty===0?'หมด Stock':p.qty<=p.min?'Stock ต่ำ':'Stock ปกติ';
+    const safeId=p.id.replace(/'/g,"\'");
+    return '<div onclick="rSelectPart(\'' + safeId + '\')" style="cursor:pointer;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.background=\'#1f3460\';" onmouseout="this.style.background=\'#0d1b2a\';">'
+      +'<div>'
+      +'<div style="font-size:.8rem;font-weight:600;color:#e8f0fe">'+p.name+'</div>'
+      +'<div style="font-size:.68rem;color:#607d8b;margin-top:2px">'+(p.model||'')+(p.loc?' · '+p.loc:'')+'</div>'
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0;margin-left:10px">'
+      +'<div style="font-size:.95rem;font-weight:800;color:'+stockColor+'">'+p.qty+'</div>'
+      +'<div style="font-size:.62rem;color:'+stockColor+'">'+stockLabel+'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+window.rSelectPart=function(id){
+  const p=parts.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('rP').value=id;
+  document.getElementById('rSearch').value=p.name+(p.model?' ('+p.model+')':'');
+  document.getElementById('rResultList').innerHTML='';
+  const box=document.getElementById('rSelectedBox');
+  document.getElementById('rSelectedName').textContent=p.name+(p.model?' ('+p.model+')':'');
+  document.getElementById('rSelectedSub').textContent='Stock คงเหลือ: '+p.qty+' ชิ้น'+(p.loc?' · ตำแหน่ง: '+p.loc:'');
+  box.style.display='flex';
+}
+
+window.rClearSelect=function(){
+  document.getElementById('rP').value='';
+  document.getElementById('rSearch').value='';
+  document.getElementById('rResultList').innerHTML='';
+  document.getElementById('rSelectedBox').style.display='none';
 }
 
 window.doR=async function(){
-  const s=document.getElementById('rP'),o=s.options[s.selectedIndex];
-  if(!o.value){alert('กรุณาเลือกอะไหล่');return;}
+  const partId=document.getElementById('rP').value;
+  if(!partId){alert('กรุณาเลือกอะไหล่');return;}
   const n=parseInt(document.getElementById('rQ').value)||0,u=document.getElementById('rU').value||currentUser.username,r=document.getElementById('rR').value||'—';
   if(n<=0){alert('จำนวนต้องมากกว่า 0');return;}
-  const p=parts.find(x=>x.id===o.value),bef=p.qty,aft=bef+n;
+  const p=parts.find(x=>x.id===partId),bef=p.qty,aft=bef+n;
   await db.collection('parts').doc(p.id).update({qty:aft});
   await db.collection('logs').add({partId:p.id,partName:p.name,pn:p.pn,user:u,userId:currentUser.id,action:'RECEIVE',change:n,before:bef,after:aft,ref:r,time:firebase.firestore.FieldValue.serverTimestamp()});
   const ai=alerts.find(a=>a.pn===p.pn&&(a.status==='PENDING'||a.status==='ORDERED'));
   if(ai&&aft>p.min)await db.collection('alerts').doc(ai.id).update({status:'RESOLVED'});
   document.getElementById('rT').style.display='flex';document.getElementById('rM').textContent='รับเข้าสำเร็จ — '+p.name+' +'+n+' ชิ้น (คงเหลือ '+aft+')';
-  s.value='';await loadAll();
+  rClearSelect();await loadAll();
 }
 
 function rLog(filterUser){
