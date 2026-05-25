@@ -7,94 +7,94 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0f1724;font-family:'Segoe UI',sans-serif;color:#f1f5f9}
+body{background:linear-gradient(135deg,#0d1b2a 0%,#0a1628 100%);font-family:'Segoe UI',sans-serif;color:#e8f0fe}
 /* LOGIN */
-.login-wrap{display:flex;align-items:center;justify-content:center;height:100vh;background:#0f1724}
-.login-box{background:#1a2535;border:1px solid #1e2d42;border-radius:12px;padding:36px 32px;width:100%;max-width:360px}
+.login-wrap{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0d1b2a 0%,#091221 50%,#0d1b2a 100%)}
+.login-box{background:#1b2d4f;border:1px solid #1f3460;border-radius:12px;padding:36px 32px;width:100%;max-width:360px}
 .login-logo{text-align:center;margin-bottom:24px}
-.login-logo .icon{font-size:2rem;color:#2563eb}
-.login-logo h1{font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-top:6px}
-.login-logo p{font-size:.72rem;color:#475569;margin-top:2px}
-.flabel{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:block}
-.finput{width:100%;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;color:#f1f5f9;padding:9px 12px;font-size:.82rem;outline:none;margin-bottom:12px}
-.finput:focus{border-color:#2563eb}
-.btn-login{width:100%;background:#2563eb;border:none;border-radius:6px;padding:10px;font-size:.85rem;font-weight:700;color:#fff;cursor:pointer;margin-top:4px}
-.btn-login:hover{background:#1d4ed8}
+.login-logo .icon{font-size:2rem;color:#2979ff}
+.login-logo h1{font-size:1.1rem;font-weight:700;color:#e8f0fe;margin-top:6px}
+.login-logo p{font-size:.72rem;color:#546e7a;margin-top:2px}
+.flabel{font-size:.65rem;color:#607d8b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:block}
+.finput{width:100%;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;color:#e8f0fe;padding:9px 12px;font-size:.82rem;outline:none;margin-bottom:12px}
+.finput:focus{border-color:#2979ff}
+.btn-login{width:100%;background:#2979ff;border:none;border-radius:6px;padding:10px;font-size:.85rem;font-weight:700;color:#fff;cursor:pointer;margin-top:4px}
+.btn-login:hover{background:#1565c0}
 .login-err{background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);color:#f87171;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:12px;display:none}
 /* APP */
 .app{display:none;height:100vh;overflow:hidden;flex-direction:row}
 .app.show{display:flex}
-.sidebar{width:220px;background:#151f2e;border-right:1px solid #1e2d42;display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s ease;z-index:50}
+.sidebar{width:220px;background:linear-gradient(180deg,#112240 0%,#0d1b35 100%);border-right:1px solid #1f3460;display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s ease;z-index:50}
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
 .sb-overlay.show{display:block}
-.hamburger{display:none;background:none;border:none;color:#f1f5f9;font-size:1.3rem;cursor:pointer;padding:4px 6px}
+.hamburger{display:none;background:none;border:none;color:#e8f0fe;font-size:1.3rem;cursor:pointer;padding:4px 6px}
 @media(max-width:768px){
   .hamburger{display:flex;align-items:center}
   .sidebar{position:fixed;top:0;left:0;height:100vh;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
 }
-.sb-brand{padding:16px;border-bottom:1px solid #1e2d42;font-size:.82rem;font-weight:700;color:#2563eb}
-.sb-brand span{color:#64748b;font-weight:400;font-size:.7rem;display:block;margin-top:2px}
-.sb-sec{font-size:.62rem;font-weight:700;letter-spacing:.1em;color:#475569;padding:14px 14px 4px;text-transform:uppercase}
-.sb-link{display:flex;align-items:center;gap:8px;padding:8px 14px;color:#94a3b8;font-size:.78rem;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
-.sb-link:hover{color:#f1f5f9;background:#1e2d42}
-.sb-link.active{color:#f1f5f9;background:rgba(37,99,235,.15);border-left-color:#2563eb}
+.sb-brand{padding:16px;border-bottom:1px solid #1f3460;font-size:.82rem;font-weight:700;color:#2979ff}
+.sb-brand span{color:#607d8b;font-weight:400;font-size:.7rem;display:block;margin-top:2px}
+.sb-sec{font-size:.62rem;font-weight:700;letter-spacing:.1em;color:#546e7a;padding:14px 14px 4px;text-transform:uppercase}
+.sb-link{display:flex;align-items:center;gap:8px;padding:8px 14px;color:#90a4ae;font-size:.78rem;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.sb-link:hover{color:#e8f0fe;background:#1f3460}
+.sb-link.active{color:#e8f0fe;background:rgba(37,99,235,.15);border-left-color:#2979ff}
 .sb-link i{font-size:.9rem;width:16px;text-align:center}
 .sb-badge{margin-left:auto;background:#dc2626;color:#fff;border-radius:8px;padding:1px 6px;font-size:.62rem;font-weight:700}
-.sb-bottom{margin-top:auto;padding:12px;border-top:1px solid #1e2d42}
+.sb-bottom{margin-top:auto;padding:12px;border-top:1px solid #1f3460}
 .btn-logout{width:100%;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#f87171;border-radius:6px;padding:7px;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-logout:hover{background:rgba(220,38,38,.2)}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:48px;background:#151f2e;border-bottom:1px solid #1e2d42;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
-.topbar .title{font-size:.88rem;font-weight:700;color:#f1f5f9;flex:1}
-.user-pill{display:flex;align-items:center;gap:6px;background:#1e2d42;border-radius:16px;padding:4px 12px;font-size:.72rem;color:#94a3b8}
+.topbar{height:48px;background:#0f1f3d;border-bottom:1px solid #1f3460;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.topbar .title{font-size:.88rem;font-weight:700;color:#e8f0fe;flex:1}
+.user-pill{display:flex;align-items:center;gap:6px;background:#1f3460;border-radius:16px;padding:4px 12px;font-size:.72rem;color:#90a4ae}
 .role-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:4px}
 .role-admin{background:rgba(37,99,235,.2);color:#60a5fa}
 .role-user{background:rgba(22,163,74,.15);color:#4ade80}
 .dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
 .page{flex:1;overflow-y:auto;padding:16px}
 /* ADMIN PANEL */
-.admin-card{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;overflow:hidden;margin-bottom:12px}
-.admin-hd{background:#1e2d42;padding:8px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:flex;align-items:center;gap:6px;justify-content:space-between}
+.admin-card{background:#1b2d4f;border:1px solid #1f3460;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);overflow:hidden;margin-bottom:12px}
+.admin-hd{background:#1f3460;padding:8px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#607d8b;display:flex;align-items:center;gap:6px;justify-content:space-between}
 .btn-sm{border:none;border-radius:4px;padding:4px 10px;font-size:.68rem;font-weight:600;cursor:pointer;color:#fff}
-.btn-sm.blue{background:#2563eb}.btn-sm.red{background:#dc2626}.btn-sm.green{background:#16a34a}
+.btn-sm.blue{background:#2979ff}.btn-sm.red{background:#dc2626}.btn-sm.green{background:#16a34a}
 /* STAT GRID */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.stat{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;padding:12px 14px}
-.stat.blue{border-top:3px solid #2563eb}.stat.red{border-top:3px solid #dc2626}.stat.amber{border-top:3px solid #d97706}.stat.green{border-top:3px solid #16a34a}
-.stat-lbl{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.stat{background:#1b2d4f;border:1px solid #1f3460;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);padding:12px 14px}
+.stat.blue{border-top:3px solid #2979ff}.stat.red{border-top:3px solid #dc2626}.stat.amber{border-top:3px solid #d97706}.stat.green{border-top:3px solid #16a34a}
+.stat-lbl{font-size:.62rem;color:#607d8b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 .stat-val{font-size:1.6rem;font-weight:800;line-height:1}
 .stat.blue .stat-val{color:#60a5fa}.stat.red .stat-val{color:#f87171}.stat.amber .stat-val{color:#fbbf24}.stat.green .stat-val{color:#4ade80}
-.card{background:#1a2535;border:1px solid #1e2d42;border-radius:8px;overflow:hidden;margin-bottom:12px}
-.card-hd{background:#1e2d42;padding:8px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:flex;align-items:center;gap:6px}
+.card{background:#1b2d4f;border:1px solid #1f3460;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);overflow:hidden;margin-bottom:12px}
+.card-hd{background:#1f3460;padding:8px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#607d8b;display:flex;align-items:center;gap:6px}
 table.t{width:100%;border-collapse:collapse;font-size:.74rem}
-table.t th{padding:6px 10px;color:#475569;font-size:.62rem;text-transform:uppercase;border-bottom:1px solid #1e2d42;text-align:left}
-table.t td{padding:7px 10px;border-bottom:1px solid #1e2d42;color:#cbd5e1}
+table.t th{padding:6px 10px;color:#546e7a;font-size:.62rem;text-transform:uppercase;border-bottom:1px solid #1f3460;text-align:left}
+table.t td{padding:7px 10px;border-bottom:1px solid #1f3460;color:#cbd5e1}
 table.t tr:last-child td{border-bottom:none}
 table.t tr:hover td{background:rgba(255,255,255,.03)}
 .badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:.62rem;font-weight:700}
 .bW{background:rgba(220,38,38,.15);color:#f87171}.bR{background:rgba(22,163,74,.15);color:#4ade80}
 .bA{background:rgba(14,165,233,.15);color:#38bdf8}.bP{background:rgba(217,119,6,.2);color:#fbbf24}
 .pform{padding:12px}
-.finput-sm{width:100%;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;color:#f1f5f9;padding:7px 10px;font-size:.78rem;outline:none;margin-bottom:10px}
-.finput-sm:focus{border-color:#2563eb}
+.finput-sm{width:100%;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;color:#e8f0fe;padding:7px 10px;font-size:.78rem;outline:none;margin-bottom:10px}
+.finput-sm:focus{border-color:#2979ff}
 .btn{width:100%;border:none;border-radius:6px;padding:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:#fff;margin-bottom:6px}
-.btn-blue{background:#2563eb}.btn-green{background:#16a34a}.btn-red{background:#dc2626}
-.preview-box{background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:10px 12px;font-size:.75rem;margin-bottom:10px}
-.preview-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1a2535}
+.btn-blue{background:#2979ff}.btn-green{background:#16a34a}.btn-red{background:#dc2626}
+.preview-box{background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:10px 12px;font-size:.75rem;margin-bottom:10px}
+.preview-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1b2d4f}
 .preview-row:last-child{border:none}
-.pl{color:#64748b}.pv{color:#f1f5f9;font-weight:600}
+.pl{color:#607d8b}.pv{color:#e8f0fe;font-weight:600}
 .toast{border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;display:none;align-items:center;gap:6px}
 .toast.success{background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);color:#4ade80}
 .toast.error{background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);color:#f87171}
-.loading{text-align:center;padding:40px;color:#475569;font-size:.85rem}
+.loading{text-align:center;padding:40px;color:#546e7a;font-size:.85rem}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.bar-wrap{height:3px;background:#1e2d42;border-radius:2px;margin-top:3px;width:50px}
+.bar-wrap{height:3px;background:#1f3460;border-radius:2px;margin-top:3px;width:50px}
 .bar-fill{height:100%;border-radius:2px}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
-.modal{background:#1a2535;border:1px solid #1e2d42;border-radius:10px;padding:24px;width:100%;max-width:380px}
-.modal h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:#f1f5f9}
+.modal{background:#162040;border:1px solid #1f3460;border-radius:12px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.4);width:100%;max-width:380px}
+.modal h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:#e8f0fe}
 .modal-footer{display:flex;gap:8px;margin-top:16px}
 .modal-footer button{flex:1;border:none;border-radius:6px;padding:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:#fff}
 </style>
@@ -137,7 +137,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <div class="sb-link admin-only" style="display:none" onclick="nav('categories',this)"><i class="ti ti-tag"></i>จัดการหมวดหมู่</div>
     <div class="sb-link admin-only" style="display:none" onclick="nav('loginlog',this)"><i class="ti ti-login"></i>Log การ Login</div>
     <div class="sb-bottom">
-      <div style="font-size:.68rem;color:#475569;margin-bottom:8px;text-align:center" id="sideUserInfo"></div>
+      <div style="font-size:.68rem;color:#546e7a;margin-bottom:8px;text-align:center" id="sideUserInfo"></div>
       <button class="btn-logout" style="background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.2);color:#60a5fa;margin-bottom:6px" onclick="openModal('modalChangePw')"><i class="ti ti-key"></i> เปลี่ยน Password</button>
       <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> ออกจากระบบ</button>
     </div>
@@ -197,7 +197,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <button id="pmDelBtn" class="btn btn-red" style="display:none;margin-top:4px" onclick="deletePartFromModal()"><i class="ti ti-trash"></i> ลบอะไหล่นี้</button>
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalPart')">ยกเลิก</button>
-      <button style="background:#2563eb" onclick="savePartModal()">บันทึก</button>
+      <button style="background:#2979ff" onclick="savePartModal()">บันทึก</button>
     </div>
   </div>
 </div>
@@ -211,7 +211,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <input class="finput-sm" type="text" id="newCatName" placeholder="เช่น Hydraulic, Sensor">
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalAddCat')">ยกเลิก</button>
-      <button style="background:#2563eb" onclick="doAddCat()">เพิ่ม</button>
+      <button style="background:#2979ff" onclick="doAddCat()">เพิ่ม</button>
     </div>
   </div>
 </div>
@@ -221,7 +221,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
   <div class="modal" style="max-width:420px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 id="vpTitle" style="margin:0;font-size:.95rem"></h3>
-      <button onclick="closeModal('modalViewPart')" style="background:none;border:none;color:#475569;font-size:1.2rem;cursor:pointer"><i class="ti ti-x"></i></button>
+      <button onclick="closeModal('modalViewPart')" style="background:none;border:none;color:#546e7a;font-size:1.2rem;cursor:pointer"><i class="ti ti-x"></i></button>
     </div>
     <div id="vpBody"></div>
   </div>
@@ -231,30 +231,30 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 <div class="modal-overlay" id="modalImport">
   <div class="modal" style="max-width:440px">
     <h3><i class="ti ti-file-upload"></i> Import อะไหล่จาก Excel</h3>
-    <div style="background:#0f1724;border:1px solid #1e2d42;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.75rem;color:#94a3b8">
-      <div style="color:#f1f5f9;font-weight:600;margin-bottom:6px">📋 รูปแบบ Excel ที่รองรับ</div>
+    <div style="background:#0d1b2a;border:1px solid #1f3460;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.75rem;color:#90a4ae">
+      <div style="color:#e8f0fe;font-weight:600;margin-bottom:6px">📋 รูปแบบ Excel ที่รองรับ</div>
       <div>คอลัมน์ตามลำดับ:</div>
       <div style="color:#60a5fa;margin:4px 0">ชื่ออะไหล่ | Part Model | หมวดหมู่ | Qty | Min | Max | ตำแหน่ง | หมายเหตุ</div>
-      <div style="color:#475569;font-size:.68rem">* บรรทัดแรกเป็น header จะถูกข้ามอัตโนมัติ</div>
+      <div style="color:#546e7a;font-size:.68rem">* บรรทัดแรกเป็น header จะถูกข้ามอัตโนมัติ</div>
     </div>
     <button class="btn btn-blue" style="margin-bottom:10px" onclick="downloadTemplate()"><i class="ti ti-download"></i> ดาวน์โหลด Template</button>
     <label class="flabel">เลือกไฟล์ Excel</label>
     <input type="file" id="importFile" accept=".xlsx,.xls" class="finput-sm" style="padding:6px">
     <div style="margin:10px 0">
-      <label style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:#94a3b8;cursor:pointer">
+      <label style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:#90a4ae;cursor:pointer">
         <input type="checkbox" id="importReplace" style="width:16px;height:16px">
         <span>ลบข้อมูลเดิมทั้งหมดก่อน Import (ถ้าไม่เลือก จะเพิ่มต่อจากของเดิม)</span>
       </label>
     </div>
-    <div id="importPreview" style="display:none;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:10px;margin-bottom:10px;font-size:.75rem;max-height:150px;overflow-y:auto"></div>
+    <div id="importPreview" style="display:none;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:10px;margin-bottom:10px;font-size:.75rem;max-height:150px;overflow-y:auto"></div>
     <div class="login-err" id="importErr"></div>
     <div id="importProgress" style="display:none;margin-bottom:10px">
-      <div style="font-size:.75rem;color:#94a3b8;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
-      <div style="background:#1e2d42;border-radius:4px;height:6px"><div id="importProgressBar" style="background:#2563eb;height:100%;border-radius:4px;width:0%;transition:width .3s"></div></div>
+      <div style="font-size:.75rem;color:#90a4ae;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
+      <div style="background:#1f3460;border-radius:4px;height:6px"><div id="importProgressBar" style="background:#2979ff;height:100%;border-radius:4px;width:0%;transition:width .3s"></div></div>
     </div>
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalImport');resetImport()">ยกเลิก</button>
-      <button style="background:#2563eb" id="importBtn" onclick="doImport()"><i class="ti ti-upload"></i> Import</button>
+      <button style="background:#2979ff" id="importBtn" onclick="doImport()"><i class="ti ti-upload"></i> Import</button>
     </div>
   </div>
 </div>
@@ -263,7 +263,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 <div class="modal-overlay" id="modalConfirmW">
   <div class="modal">
     <h3><i class="ti ti-alert-triangle" style="color:#f87171"></i> ยืนยันการเบิก</h3>
-    <div id="confirmWDetail" style="background:#0f1724;border:1px solid #1e2d42;border-radius:8px;padding:12px;margin-bottom:16px;font-size:.82rem"></div>
+    <div id="confirmWDetail" style="background:#0d1b2a;border:1px solid #1f3460;border-radius:8px;padding:12px;margin-bottom:16px;font-size:.82rem"></div>
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalConfirmW')">ยกเลิก</button>
       <button style="background:#dc2626" onclick="confirmDoW()"><i class="ti ti-arrow-up-circle"></i> ยืนยันเบิก</button>
@@ -284,7 +284,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     <input class="finput-sm" type="password" id="cpConfirm" placeholder="พิมพ์ซ้ำอีกครั้ง">
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalChangePw')">ยกเลิก</button>
-      <button style="background:#2563eb" onclick="doChangePw()">บันทึก</button>
+      <button style="background:#2979ff" onclick="doChangePw()">บันทึก</button>
     </div>
   </div>
 </div>
@@ -293,14 +293,14 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 <div class="modal-overlay" id="modalResetPw">
   <div class="modal">
     <h3><i class="ti ti-key"></i> Reset Password</h3>
-    <p style="color:#94a3b8;font-size:.8rem;margin-bottom:16px">ตั้ง Password ใหม่ให้ <strong id="resetUserName" style="color:#f1f5f9"></strong></p>
+    <p style="color:#90a4ae;font-size:.8rem;margin-bottom:16px">ตั้ง Password ใหม่ให้ <strong id="resetUserName" style="color:#e8f0fe"></strong></p>
     <div class="login-err" id="resetErr"></div>
     <input type="hidden" id="resetUserId">
     <label class="flabel">Password ใหม่</label>
     <input class="finput-sm" type="password" id="resetNewPw" placeholder="อย่างน้อย 6 ตัวอักษร">
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalResetPw')">ยกเลิก</button>
-      <button style="background:#2563eb" onclick="doResetPassword()">ยืนยัน Reset</button>
+      <button style="background:#2979ff" onclick="doResetPassword()">ยืนยัน Reset</button>
     </div>
   </div>
 </div>
@@ -323,7 +323,7 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
     </select>
     <div class="modal-footer">
       <button style="background:#374151" onclick="closeModal('modalAddUser')">ยกเลิก</button>
-      <button style="background:#2563eb" onclick="doAddUser()">สร้าง User</button>
+      <button style="background:#2979ff" onclick="doAddUser()">สร้าง User</button>
     </div>
   </div>
 </div>
@@ -433,21 +433,21 @@ async function rLoginLog(){
   const snap=await db.collection('loginLogs').orderBy('time','desc').limit(100).get();
   const loginlogs=snap.docs.map(d=>({id:d.id,...d.data()}));
   const rows=loginlogs.map(l=>'<tr>'
-    +'<td style="color:#475569;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
-    +'<td style="color:#f1f5f9;font-weight:600">'+(l.displayName||l.username||'—')+'</td>'
-    +'<td style="color:#94a3b8">'+(l.username||'—')+'</td>'
+    +'<td style="color:#546e7a;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
+    +'<td style="color:#e8f0fe;font-weight:600">'+(l.displayName||l.username||'—')+'</td>'
+    +'<td style="color:#90a4ae">'+(l.username||'—')+'</td>'
     +'<td><span class="badge '+(l.role==='admin'?'bA':'bR')+'">'+(l.role==='admin'?'Admin':'User')+'</span></td>'
     +'</tr>').join('');
   return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Log การ Login ('+loginlogs.length+' รายการล่าสุด)</div>'
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:400px"><thead><tr><th>เวลา</th><th>ชื่อ</th><th>Username</th><th>Role</th></tr></thead>'
-    +'<tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
+    +'<tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:#546e7a;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
 }
 
 async function rCategories(){
   const snap=await db.collection('categories').orderBy('name').get();
   categories=snap.docs.map(d=>({id:d.id,...d.data()}));
   const rows=categories.map(c=>'<tr>'
-    +'<td style="color:#f1f5f9;font-weight:600">'+c.name+'</td>'
+    +'<td style="color:#e8f0fe;font-weight:600">'+c.name+'</td>'
     +'<td style="white-space:nowrap"><button class="btn-sm red" onclick="deleteCat(\''+c.id+'\',\''+c.name+'\')"><i class="ti ti-trash"></i> ลบ</button></td>'
     +'</tr>').join('');
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
@@ -480,7 +480,7 @@ window.doAddCat=async function(){
 async function rUsers(){
   const snap=await db.collection('users').get();
   const users=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const rows=users.map(u=>'<tr><td style="color:#f1f5f9;font-weight:600">'+(u.displayName||'—')+'</td><td style="color:#94a3b8">'+u.username+'</td><td><span class="badge '+(u.role==='admin'?'bA':'bR')+'">'+(u.role==='admin'?'Admin':'User')+'</span></td><td><span class="badge '+(u.disabled?'bW':'bR')+'">'+(u.disabled?'ระงับ':'ใช้งาน')+'</span></td><td style="display:flex;gap:4px;padding:7px 10px">'+(u.id!==currentUser.id?'<button class="btn-sm '+(u.disabled?'green':'red')+'" onclick="toggleUser(\''+u.id+'\','+u.disabled+')">'+( u.disabled?'เปิดใช้':'ระงับ')+'</button><button class="btn-sm red" onclick="deleteUser(\''+u.id+'\',\''+u.username+'\')">ลบ</button>':'<span style="color:#475569;font-size:.65rem">— บัญชีตัวเอง —</span>')+'</td></tr>').join('');
+  const rows=users.map(u=>'<tr><td style="color:#e8f0fe;font-weight:600">'+(u.displayName||'—')+'</td><td style="color:#90a4ae">'+u.username+'</td><td><span class="badge '+(u.role==='admin'?'bA':'bR')+'">'+(u.role==='admin'?'Admin':'User')+'</span></td><td><span class="badge '+(u.disabled?'bW':'bR')+'">'+(u.disabled?'ระงับ':'ใช้งาน')+'</span></td><td style="display:flex;gap:4px;padding:7px 10px">'+(u.id!==currentUser.id?'<button class="btn-sm '+(u.disabled?'green':'red')+'" onclick="toggleUser(\''+u.id+'\','+u.disabled+')">'+( u.disabled?'เปิดใช้':'ระงับ')+'</button><button class="btn-sm red" onclick="deleteUser(\''+u.id+'\',\''+u.username+'\')">ลบ</button>':'<span style="color:#546e7a;font-size:.65rem">— บัญชีตัวเอง —</span>')+'</td></tr>').join('');
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:.95rem;font-weight:700">จัดการ Users ('+users.length+' บัญชี)</div><button class="btn-sm blue" onclick="openModal(\'modalAddUser\')"><i class="ti ti-user-plus"></i> เพิ่ม User</button></div><div class="admin-card"><table class="t"><thead><tr><th>ชื่อ</th><th>Username</th><th>Role</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 
@@ -599,34 +599,34 @@ function rDash(){
 
   const urgentRows=urgentParts.length>0
     ? urgentParts.map(p=>'<tr>'
-        +'<td><div style="color:#f1f5f9;font-size:.78rem;font-weight:600">'+p.name+'</div>'
-        +(p.model?'<div style="color:#94a3b8;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
+        +'<td><div style="color:#e8f0fe;font-size:.78rem;font-weight:600">'+p.name+'</div>'
+        +(p.model?'<div style="color:#90a4ae;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
         +'<td><span class="badge '+(p.qty===0?'bW':'bP')+'">'+(p.qty===0?'หมด':'ต่ำ')+'</span></td>'
         +'<td style="color:'+(p.qty===0?'#f87171':'#fbbf24')+';font-weight:700">'+p.qty+'</td>'
-        +'<td style="color:#64748b">'+p.min+'</td>'
+        +'<td style="color:#607d8b">'+p.min+'</td>'
         +'</tr>').join('')
     :'<tr><td colspan="5" style="text-align:center;color:#4ade80;padding:16px">✅ ไม่มีรายการเร่งด่วน</td></tr>';
 
   const urgentCard='<div class="card" style="margin-bottom:12px">'
     +'<div class="card-hd" style="justify-content:space-between"><span><i class="ti ti-alert-circle"></i> รายการเร่งด่วน</span>'
-    +(totalBad>8?'<span style="color:#475569;font-size:.65rem">แสดง 8/'+totalBad+'</span>':'')
+    +(totalBad>8?'<span style="color:#546e7a;font-size:.65rem">แสดง 8/'+totalBad+'</span>':'')
     +'</div>'
     +'<table class="t"><thead><tr><th>ชื่ออะไหล่</th><th>สถานะ</th><th>Qty</th><th>Min</th></tr></thead>'
     +'<tbody>'+urgentRows+'</tbody></table></div>';
 
   // ประวัติล่าสุด
   const lr=logs.length>0
-    ? logs.slice(0,6).map(l=>'<div style="padding:10px 12px;border-bottom:1px solid #1e2d42;display:flex;justify-content:space-between;align-items:center">'
+    ? logs.slice(0,6).map(l=>'<div style="padding:10px 12px;border-bottom:1px solid #1f3460;display:flex;justify-content:space-between;align-items:center">'
         +'<div>'
-        +'<div style="color:#f1f5f9;font-size:.78rem;font-weight:600">'+(l.partName||'—')+'</div>'
-        +'<div style="color:#475569;font-size:.65rem">'+ft(l.time)+' · '+(l.user||'—')+'</div>'
+        +'<div style="color:#e8f0fe;font-size:.78rem;font-weight:600">'+(l.partName||'—')+'</div>'
+        +'<div style="color:#546e7a;font-size:.65rem">'+ft(l.time)+' · '+(l.user||'—')+'</div>'
         +'</div>'
         +'<div style="text-align:right">'
         +ba(l.action)
         +'<div style="font-weight:700;font-size:.82rem;color:'+(l.change<0?'#f87171':'#4ade80')+';margin-top:2px">'+(l.change>0?'+':'')+l.change+' → '+l.after+'</div>'
         +'</div>'
         +'</div>').join('')
-    :'<div style="text-align:center;color:#475569;padding:20px;font-size:.8rem">ยังไม่มีประวัติการเบิก/รับ</div>';
+    :'<div style="text-align:center;color:#546e7a;padding:20px;font-size:.8rem">ยังไม่มีประวัติการเบิก/รับ</div>';
 
   const logCard='<div class="card">'
     +'<div class="card-hd"><i class="ti ti-history"></i> การเคลื่อนไหวล่าสุด</div>'
@@ -638,8 +638,8 @@ function rDash(){
   const topCats=Object.entries(catCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const maxVal=topCats.length?topCats[0][1]:1;
   const chartBars=topCats.map(([cat,cnt])=>'<div style="margin-bottom:10px">'
-    +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px"><span style="color:#94a3b8">'+cat+'</span><span style="color:#f87171;font-weight:700">'+cnt+' รายการ</span></div>'
-    +'<div style="background:#1e2d42;border-radius:4px;height:8px"><div style="background:#dc2626;height:100%;border-radius:4px;width:'+Math.round(cnt/maxVal*100)+'%"></div></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px"><span style="color:#90a4ae">'+cat+'</span><span style="color:#f87171;font-weight:700">'+cnt+' รายการ</span></div>'
+    +'<div style="background:#1f3460;border-radius:4px;height:8px"><div style="background:#dc2626;height:100%;border-radius:4px;width:'+Math.round(cnt/maxVal*100)+'%"></div></div>'
     +'</div>').join('');
   const chartCard=topCats.length
     ?'<div class="card" style="margin-bottom:12px"><div class="card-hd"><i class="ti ti-chart-bar"></i> หมวดที่ Stock ต่ำ (Top 5)</div><div style="padding:12px">'+chartBars+'</div></div>'
@@ -657,8 +657,8 @@ function rParts(q){
     const safeId=p.id;
     const searchTxt=((p.name||'')+'|'+(p.pn||'')+'|'+(p.model||'')+'|'+(p.cat||'')).toLowerCase();
     return '<tr '+clickRow+'data-id="'+safeId+'" data-search="'+searchTxt.replace(/"/g,'&quot;')+'">'
-      +'<td><div style="color:#f1f5f9;font-weight:600;font-size:.8rem">'+p.name+'</div>'
-      +(p.model?'<div style="color:#94a3b8;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
+      +'<td><div style="color:#e8f0fe;font-weight:600;font-size:.8rem">'+p.name+'</div>'
+      +(p.model?'<div style="color:#90a4ae;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
       +'<td><span class="badge bA">'+p.cat+'</span></td>'
       +'<td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td>'
       
@@ -666,18 +666,18 @@ function rParts(q){
       +'</tr>';
   }).join('');
   const searchBar='<div style="position:relative;margin-bottom:10px">'
-    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569;font-size:.9rem"></i>'
+    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#546e7a;font-size:.9rem"></i>'
     +'<input id="partSearch" class="finput-sm" type="text" placeholder="ค้นหาชื่อ, Part No., Model, หมวด..." '
     +'style="padding-left:32px;margin-bottom:0" '
     +'oninput="filterPartsLive(this.value)">'
     +'</div>';
-  const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#475569;font-size:.75rem"></span>';
+  const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#546e7a;font-size:.75rem"></span>';
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px">'+(isAdmin?'<button class="btn-sm green" onclick="openModal(\'modalImport\')" ><i class="ti ti-file-upload"></i> Import</button>':'')+'<button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
     +searchBar
-    +'<div style="font-size:.7rem;color:#475569;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่รายการเพื่อดูรายละเอียด</div>'
+    +'<div style="font-size:.7rem;color:#546e7a;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่รายการเพื่อดูรายละเอียด</div>'
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:360px"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
     +r
-    +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#475569;padding:20px">ไม่พบรายการ</td></tr>'
+    +'<tr id="partsEmpty" style="display:none"><td colspan="4" style="text-align:center;color:#546e7a;padding:20px">ไม่พบรายการ</td></tr>'
     +'</tbody></table></div></div>';
 }
 
@@ -753,8 +753,8 @@ document.addEventListener('change',function(e){
       const prev=document.getElementById('importPreview');
       prev.style.display='block';
       prev.innerHTML='<div style="color:#4ade80;font-weight:600;margin-bottom:6px">✅ พบ '+_importData.length+' รายการ</div>'
-        +_importData.slice(0,5).map(p=>'<div style="color:#94a3b8;padding:2px 0;border-bottom:1px solid #1e2d42">'+p.name+(p.model?' ('+p.model+')':'')+'</div>').join('')
-        +(_importData.length>5?'<div style="color:#475569;font-size:.68rem">...และอีก '+(_importData.length-5)+' รายการ</div>':'');
+        +_importData.slice(0,5).map(p=>'<div style="color:#90a4ae;padding:2px 0;border-bottom:1px solid #1f3460">'+p.name+(p.model?' ('+p.model+')':'')+'</div>').join('')
+        +(_importData.length>5?'<div style="color:#546e7a;font-size:.68rem">...และอีก '+(_importData.length-5)+' รายการ</div>':'');
       document.getElementById('importErr').style.display='none';
     }catch(err){
       document.getElementById('importErr').textContent='อ่านไฟล์ไม่ได้: '+err.message;
@@ -862,15 +862,15 @@ window.viewPart=function(id){
   const pct=p.max>0?Math.min(100,Math.round(p.qty/p.max*100)):0;
   const barColor=p.qty===0?'#dc2626':p.qty<=p.min?'#f59e0b':'#22c55e';
   document.getElementById('vpTitle').textContent=p.name;
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div>'+statusBadge+'</div><div style="font-size:.72rem;color:#475569">'+(p.cat||'—')+'</div></div>';
-  html+='<div style="background:#1e2d42;border-radius:8px;padding:12px;margin-bottom:12px">';
-  html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.72rem;color:#64748b">Stock คงเหลือ</span><span style="font-size:1.2rem;font-weight:800;color:'+barColor+'">'+p.qty+'</span></div>';
-  html+='<div style="background:#0f1724;border-radius:4px;height:8px;margin-bottom:6px"><div style="background:'+barColor+';height:100%;border-radius:4px;width:'+pct+'%"></div></div>';
-  html+='<div style="display:flex;justify-content:space-between;font-size:.65rem;color:#475569"><span>Min: '+p.min+'</span><span>Max: '+p.max+'</span></div></div>';
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div>'+statusBadge+'</div><div style="font-size:.72rem;color:#546e7a">'+(p.cat||'—')+'</div></div>';
+  html+='<div style="background:#1f3460;border-radius:8px;padding:12px;margin-bottom:12px">';
+  html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.72rem;color:#607d8b">Stock คงเหลือ</span><span style="font-size:1.2rem;font-weight:800;color:'+barColor+'">'+p.qty+'</span></div>';
+  html+='<div style="background:#0d1b2a;border-radius:4px;height:8px;margin-bottom:6px"><div style="background:'+barColor+';height:100%;border-radius:4px;width:'+pct+'%"></div></div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:.65rem;color:#546e7a"><span>Min: '+p.min+'</span><span>Max: '+p.max+'</span></div></div>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
   var fields=[['Part Model',p.model||'—'],['Brand',p.brand||'—'],['ตำแหน่ง',p.loc||'—'],['หมายเหตุ',p.note||'—']];
   fields.forEach(function(f){
-    html+='<div style="background:#1e2d42;border-radius:6px;padding:8px"><div style="font-size:.62rem;color:#475569;margin-bottom:2px">'+f[0]+'</div><div style="font-size:.78rem;color:#f1f5f9;font-weight:600">'+f[1]+'</div></div>';
+    html+='<div style="background:#1f3460;border-radius:6px;padding:8px"><div style="font-size:.62rem;color:#546e7a;margin-bottom:2px">'+f[0]+'</div><div style="font-size:.78rem;color:#e8f0fe;font-weight:600">'+f[1]+'</div></div>';
   });
   html+='</div>';
   if(isAdmin){
@@ -976,17 +976,17 @@ function rWith(){
   const defUser=currentUser.displayName||currentUser.username;
   const wOpts=parts.map(p=>'<option value="'+p.id+'" data-qty="'+p.qty+'" data-min="'+p.min+'" data-name="'+p.name.replace(/"/g,"&quot;")+'">'+p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty+'</option>').join('');
   return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div>'
-    +'<div style="font-size:.72rem;color:#64748b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div>'
+    +'<div style="font-size:.72rem;color:#607d8b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div>'
     +'<div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div>'
     +'<div id="wE" class="toast error"><i class="ti ti-alert-circle"></i><span id="wEM"></span></div>'
     +'<div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลเบิก</div><div class="pform">'
     +'<label class="flabel">ค้นหาและเลือกอะไหล่</label>'
     +'<div style="position:relative;margin-bottom:6px">'
-    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569"></i>'
+    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#546e7a"></i>'
     +'<input class="finput-sm" type="text" id="wSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="wFilter(this.value)">'
     +'</div>'
     +'<select class="finput-sm" id="wP" onchange="wPrev()" style="margin-bottom:10px"><option value="">-- เลือก --</option>'+wOpts+'</select>'
-    +'<div id="wPartInfo" style="display:none;background:#0f1724;border:1px solid #1e2d42;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;color:#94a3b8"></div>'
+    +'<div id="wPartInfo" style="display:none;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;color:#90a4ae"></div>'
     +'<label class="flabel">จำนวนที่เบิก</label>'
     +'<input class="finput-sm" type="number" id="wQ" min="1" value="1" oninput="wPrev()">'
     +'<label class="flabel">Work Order / Ref.</label>'
@@ -1048,12 +1048,12 @@ window.doW=function(){
   _pendingW={p,n,u,r};
   const aft=p.qty-n;
   document.getElementById('confirmWDetail').innerHTML=
-    '<div style="color:#94a3b8;margin-bottom:8px">รายละเอียดการเบิก</div>'
-    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">อะไหล่</span><span style="color:#f1f5f9;font-weight:600">'+p.name+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">จำนวนเบิก</span><span style="color:#f87171;font-weight:700">-'+n+' ชิ้น</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">Stock หลังเบิก</span><span style="color:'+(aft<=p.min?'#f87171':'#4ade80')+';font-weight:700">'+aft+' ชิ้น</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2d42"><span style="color:#64748b">ผู้เบิก</span><span style="color:#f1f5f9">'+u+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:#64748b">Ref.</span><span style="color:#f1f5f9">'+r+'</span></div>'
+    '<div style="color:#90a4ae;margin-bottom:8px">รายละเอียดการเบิก</div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">อะไหล่</span><span style="color:#e8f0fe;font-weight:600">'+p.name+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">จำนวนเบิก</span><span style="color:#f87171;font-weight:700">-'+n+' ชิ้น</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">Stock หลังเบิก</span><span style="color:'+(aft<=p.min?'#f87171':'#4ade80')+';font-weight:700">'+aft+' ชิ้น</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">ผู้เบิก</span><span style="color:#e8f0fe">'+u+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:#607d8b">Ref.</span><span style="color:#e8f0fe">'+r+'</span></div>'
     +(aft<=p.min?'<div style="margin-top:8px;color:#fbbf24;font-size:.75rem"><i class="ti ti-alert-triangle"></i> Stock จะต่ำกว่า Min หลังเบิก</div>':'');
   openModal('modalConfirmW');
 }
@@ -1083,7 +1083,7 @@ function rRec(){
     +'<div style="max-width:420px"><div class="card"><div class="card-hd"><i class="ti ti-pencil"></i> กรอกข้อมูลรับเข้า</div><div class="pform">'
     +'<label class="flabel">ค้นหาและเลือกอะไหล่</label>'
     +'<div style="position:relative;margin-bottom:6px">'
-    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569"></i>'
+    +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#546e7a"></i>'
     +'<input class="finput-sm" type="text" id="rSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="rFilter(this.value)">'
     +'</div>'
     +'<label class="flabel">เลือกอะไหล่</label>'
@@ -1134,25 +1134,25 @@ function rLog(filterUser){
   const userOpts=users.map(u=>'<option value="'+u+'"'+(filterUser===u?' selected':'')+'>'+u+'</option>').join('');
   const filtered=filterUser?logs.filter(l=>(l.user||'—')===filterUser):logs;
   const r=filtered.map(l=>'<tr>'
-    +'<td style="color:#475569;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
-    +'<td style="color:#f1f5f9;font-size:.78rem">'+(l.partName||'—')+'</td>'
-    +'<td style="color:#94a3b8;font-size:.72rem">'+(l.user||'—')+'</td>'
+    +'<td style="color:#546e7a;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
+    +'<td style="color:#e8f0fe;font-size:.78rem">'+(l.partName||'—')+'</td>'
+    +'<td style="color:#90a4ae;font-size:.72rem">'+(l.user||'—')+'</td>'
     +'<td>'+ba(l.action)+'</td>'
     +'<td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td>'
-    +'<td style="color:#f1f5f9">'+l.after+'</td>'
-    +'<td style="color:#475569;font-size:.65rem">'+(l.ref||'—')+'</td>'
+    +'<td style="color:#e8f0fe">'+l.after+'</td>'
+    +'<td style="color:#546e7a;font-size:.65rem">'+(l.ref||'—')+'</td>'
     +'</tr>').join('');
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
     +'<div style="font-size:.95rem;font-weight:700">ประวัติ Stock</div>'
     +'<button class="btn-sm blue" onclick="exportLog()"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>'
     +'</div>'
     +'<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">'
-    +'<label style="font-size:.72rem;color:#64748b;white-space:nowrap">กรองตาม User:</label>'
+    +'<label style="font-size:.72rem;color:#607d8b;white-space:nowrap">กรองตาม User:</label>'
     +'<select class="finput-sm" style="margin:0;flex:1" onchange="filterLog(this.value)">'
     +'<option value="">ทั้งหมด</option>'+userOpts
     +'</select></div>'
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:520px"><thead><tr><th>เวลา</th><th>อะไหล่</th><th>ผู้ทำ</th><th>Action</th><th>จำนวน</th><th>หลัง</th><th>Ref.</th></tr></thead>'
-    +'<tbody>'+(r||'<tr><td colspan="7" style="text-align:center;color:#475569;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
+    +'<tbody>'+(r||'<tr><td colspan="7" style="text-align:center;color:#546e7a;padding:20px">ยังไม่มีประวัติ</td></tr>')+'</tbody></table></div></div>';
 }
 
 function rAlerts(){
@@ -1168,11 +1168,11 @@ function rAlerts(){
       ?'<button class="btn-sm blue" onclick="doAlt(this.dataset.pn)" data-pn="'+safePn+'"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>'
       :'<button class="btn-sm red" onclick="undoAlt(this.dataset.pn,this.dataset.id)" data-pn="'+safePn+'" data-id="'+safeId+'">ยกเลิก</button>';
     return '<tr>'
-      +'<td><div style="color:#f1f5f9;font-weight:600;font-size:.78rem">'+a.part+'</div>'
-      +'<div style="font-size:.65rem;color:#475569">'+a.pn+'</div></td>'
-      +'<td style="color:#64748b">'+(a.loc||'—')+'</td>'
+      +'<td><div style="color:#e8f0fe;font-weight:600;font-size:.78rem">'+a.part+'</div>'
+      +'<div style="font-size:.65rem;color:#546e7a">'+a.pn+'</div></td>'
+      +'<td style="color:#607d8b">'+(a.loc||'—')+'</td>'
       +'<td style="color:#f87171;font-weight:700">'+a.qty+'</td>'
-      +'<td style="color:#64748b;font-size:.68rem">'+a.min+'</td>'
+      +'<td style="color:#607d8b;font-size:.68rem">'+a.min+'</td>'
       +'<td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td>'
       +'<td>'+statusBadge+'</td>'
       +'<td>'+actionBtn+'</td>'
