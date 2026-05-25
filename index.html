@@ -698,7 +698,13 @@ window.exportLog=function(){
   ws['!cols']=[{wch:20},{wch:30},{wch:15},{wch:12},{wch:10},{wch:10},{wch:10},{wch:15}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Stock Log',ws);
-  XLSX.writeFile(wb,'EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  const wbout1=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const blob1=new Blob([wbout1],{type:'application/octet-stream'});
+  const url1=URL.createObjectURL(blob1);
+  const a1=document.createElement('a');
+  a1.href=url1;a1.download='EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  document.body.appendChild(a1);a1.click();
+  setTimeout(function(){document.body.removeChild(a1);URL.revokeObjectURL(url1);},1000);
 }
 
 window.exportParts=function(){
@@ -709,7 +715,13 @@ window.exportParts=function(){
   ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Parts',ws);
-  XLSX.writeFile(wb,'EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  const wbout2=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const blob2=new Blob([wbout2],{type:'application/octet-stream'});
+  const url2=URL.createObjectURL(blob2);
+  const a2=document.createElement('a');
+  a2.href=url2;a2.download='EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  document.body.appendChild(a2);a2.click();
+  setTimeout(function(){document.body.removeChild(a2);URL.revokeObjectURL(url2);},1000);
 }
 
 
@@ -723,7 +735,13 @@ window.downloadTemplate=function(){
   ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Parts Template',ws);
-  XLSX.writeFile(wb,'EGM_Parts_Template.xlsx');
+  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const blob=new Blob([wbout],{type:'application/octet-stream'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='EGM_Parts_Template.xlsx';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
 }
 
 var _importData=[];
