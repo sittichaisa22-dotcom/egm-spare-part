@@ -698,13 +698,17 @@ window.exportLog=function(){
   ws['!cols']=[{wch:20},{wch:30},{wch:15},{wch:12},{wch:10},{wch:10},{wch:10},{wch:15}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Stock Log',ws);
-  const wbout1=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+  const wbout1=XLSX.write(wb,{bookType:'xlsx',type:'binary'});
+  const bufa1=new ArrayBuffer(wbout1.length);
+  const viewa1=new Uint8Array(bufa1);
+  for(let i=0;i<wbout1.length;i++) viewa1[i]=wbout1.charCodeAt(i)&0xFF;
+  const bloba1=new Blob([bufa1],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const urla1=URL.createObjectURL(bloba1);
   const a1=document.createElement('a');
-  a1.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout1;
-  a1.download='EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a1.href=urla1;a1.download='EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx';
   a1.style.display='none';
   document.body.appendChild(a1);a1.click();
-  setTimeout(function(){document.body.removeChild(a1);},500);
+  setTimeout(function(){document.body.removeChild(a1);URL.revokeObjectURL(urla1);},1000);
 }
 
 window.exportParts=function(){
@@ -715,13 +719,17 @@ window.exportParts=function(){
   ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Parts',ws);
-  const wbout2=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+  const wbout2=XLSX.write(wb,{bookType:'xlsx',type:'binary'});
+  const bufa2=new ArrayBuffer(wbout2.length);
+  const viewa2=new Uint8Array(bufa2);
+  for(let i=0;i<wbout2.length;i++) viewa2[i]=wbout2.charCodeAt(i)&0xFF;
+  const bloba2=new Blob([bufa2],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const urla2=URL.createObjectURL(bloba2);
   const a2=document.createElement('a');
-  a2.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout2;
-  a2.download='EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a2.href=urla2;a2.download='EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx';
   a2.style.display='none';
   document.body.appendChild(a2);a2.click();
-  setTimeout(function(){document.body.removeChild(a2);},500);
+  setTimeout(function(){document.body.removeChild(a2);URL.revokeObjectURL(urla2);},1000);
 }
 
 
@@ -736,14 +744,17 @@ window.downloadTemplate=function(){
     ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
     const wb=XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,'Parts Template',ws);
-    const wbout=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+    const wbout=XLSX.write(wb,{bookType:'xlsx',type:'binary'});
+    const buf=new ArrayBuffer(wbout.length);
+    const view=new Uint8Array(buf);
+    for(let i=0;i<wbout.length;i++) view[i]=wbout.charCodeAt(i)&0xFF;
+    const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout;
-    a.download='EGM_Parts_Template.xlsx';
+    a.href=url;a.download='EGM_Parts_Template.xlsx';
     a.style.display='none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){document.body.removeChild(a);},500);
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
   }catch(e){alert('เกิดข้อผิดพลาด: '+e.message);}
 }
 
