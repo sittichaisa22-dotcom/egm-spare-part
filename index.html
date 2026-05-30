@@ -229,32 +229,46 @@ table.t tr:hover td{background:rgba(255,255,255,.03)}
 
 <!-- MODAL: Import Parts -->
 <div class="modal-overlay" id="modalImport">
-  <div class="modal" style="max-width:440px">
-    <h3><i class="ti ti-file-upload"></i> Import อะไหล่จาก Excel</h3>
-    <div style="background:#0d1b2a;border:1px solid #1f3460;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.75rem;color:#90a4ae">
-      <div style="color:#e8f0fe;font-weight:600;margin-bottom:6px">📋 รูปแบบ Excel ที่รองรับ</div>
-      <div>คอลัมน์ตามลำดับ:</div>
-      <div style="color:#60a5fa;margin:4px 0">ชื่ออะไหล่ | Part Model | หมวดหมู่ | Qty | Min | Max | ตำแหน่ง | หมายเหตุ</div>
-      <div style="color:#546e7a;font-size:.68rem">* บรรทัดแรกเป็น header จะถูกข้ามอัตโนมัติ</div>
+  <div class="modal" style="max-width:480px;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="margin:0"><i class="ti ti-file-upload"></i> Import อะไหล่จาก Excel</h3>
+      <button onclick="closeModal('modalImport');resetImport()" style="background:none;border:none;color:#546e7a;font-size:1.2rem;cursor:pointer"><i class="ti ti-x"></i></button>
     </div>
-    <button class="btn btn-blue" style="margin-bottom:10px" onclick="downloadTemplate()"><i class="ti ti-download"></i> ดาวน์โหลด Template</button>
-    <label class="flabel">เลือกไฟล์ Excel</label>
-    <input type="file" id="importFile" accept=".xlsx,.xls" class="finput-sm" style="padding:6px">
-    <div style="margin:10px 0">
-      <label style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:#90a4ae;cursor:pointer">
-        <input type="checkbox" id="importReplace" style="width:16px;height:16px">
-        <span>ลบข้อมูลเดิมทั้งหมดก่อน Import (ถ้าไม่เลือก จะเพิ่มต่อจากของเดิม)</span>
-      </label>
+
+    <!-- Step 1: เลือกไฟล์ -->
+    <div id="importStep1">
+      <button class="btn btn-blue" style="margin-bottom:12px" onclick="downloadTemplate()"><i class="ti ti-download"></i> ดาวน์โหลด Template ตัวอย่าง</button>
+      <label class="flabel">เลือกไฟล์ Excel (.xlsx)</label>
+      <input type="file" id="importFile" accept=".xlsx,.xls" class="finput-sm" style="padding:6px;margin-bottom:8px">
+      <div class="login-err" id="importErr"></div>
     </div>
-    <div id="importPreview" style="display:none;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:10px;margin-bottom:10px;font-size:.75rem;max-height:150px;overflow-y:auto"></div>
-    <div class="login-err" id="importErr"></div>
-    <div id="importProgress" style="display:none;margin-bottom:10px">
-      <div style="font-size:.75rem;color:#90a4ae;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
-      <div style="background:#1f3460;border-radius:4px;height:6px"><div id="importProgressBar" style="background:#2979ff;height:100%;border-radius:4px;width:0%;transition:width .3s"></div></div>
+
+    <!-- Step 2: Map columns -->
+    <div id="importStep2" style="display:none">
+      <div style="background:#112240;border:1px solid #1f3460;border-radius:8px;padding:10px;margin-bottom:12px;font-size:.75rem;color:#90a4ae">
+        <div style="color:#4ade80;font-weight:600;margin-bottom:4px">✅ อ่านไฟล์สำเร็จ</div>
+        <span id="importFileInfo"></span>
+      </div>
+      <div style="font-size:.8rem;font-weight:600;color:#e8f0fe;margin-bottom:8px">กำหนดคอลัมน์ให้ตรงกับ Field ในระบบ</div>
+      <div id="importColMap"></div>
+      <div class="modal-footer" style="margin-top:12px">
+        <button style="background:#374151" onclick="importBack()">← ย้อนกลับ</button>
+        <button style="background:#2979ff" onclick="importPreview()"><i class="ti ti-eye"></i> Preview</button>
+      </div>
     </div>
-    <div class="modal-footer">
-      <button style="background:#374151" onclick="closeModal('modalImport');resetImport()">ยกเลิก</button>
-      <button style="background:#2979ff" id="importBtn" onclick="doImport()"><i class="ti ti-upload"></i> Import</button>
+
+    <!-- Step 3: Preview -->
+    <div id="importStep3" style="display:none">
+      <div id="importPreviewBox" style="background:#0d1b2a;border:1px solid #1f3460;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.75rem;max-height:200px;overflow-y:auto"></div>
+      <div id="importProgress" style="display:none;margin-bottom:10px">
+        <div style="font-size:.75rem;color:#90a4ae;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
+        <div style="background:#1f3460;border-radius:4px;height:6px"><div id="importProgressBar" style="background:#2979ff;height:100%;border-radius:4px;width:0%;transition:width .3s"></div></div>
+      </div>
+      <div class="login-err" id="importErr3"></div>
+      <div class="modal-footer">
+        <button style="background:#374151" onclick="importBackToMap()">← ย้อนกลับ</button>
+        <button style="background:#2979ff" id="importBtn" onclick="doImport()"><i class="ti ti-upload"></i> Import เลย</button>
+      </div>
     </div>
   </div>
 </div>
@@ -715,51 +729,77 @@ window.exportParts=function(){
 
 
 // ---- IMPORT EXCEL ----
-window.downloadTemplate=function(){
-  try{
-    const ws=XLSX.utils.aoa_to_sheet([
-      ['ชื่ออะไหล่','Part Model','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ'],
-      ['BEARING 6205','6205-2RS','Bearing',10,2,20,'A-01','ตัวอย่างข้อมูล'],
-      ['AIR CYLINDER','CDQ2A20-15DMZ','Pneumatics',5,1,10,'B-02','']
-    ]);
-    ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,'Parts Template',ws);
-    XLSX.writeFile(wb,'EGM_Parts_Template.xlsx');
-    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
-  }catch(e){alert('เกิดข้อผิดพลาด: '+e.message);}
-}
+var _importRawRows=[];
+var _importHeaders=[];
+var _importMapped=[];
+var IMPORT_FIELDS=[
+  {key:'name',label:'ชื่ออะไหล่',required:true},
+  {key:'model',label:'Part Model',required:false},
+  {key:'brand',label:'Brand',required:false},
+  {key:'cat',label:'หมวดหมู่',required:false},
+  {key:'qty',label:'Qty (จำนวน)',required:false},
+  {key:'min',label:'Min Stock',required:false},
+  {key:'max',label:'Max Stock',required:false},
+  {key:'loc',label:'ตำแหน่ง',required:false},
+  {key:'note',label:'หมายเหตุ',required:false}
+];
 
-var _importData=[];
+window.downloadTemplate=function(){
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['ชื่ออะไหล่','Part Model','Brand','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ'],
+    ['BEARING 6205','6205-2RS','NSK','Bearing',10,2,20,'A-01',''],
+    ['AIR CYLINDER','CDQ2A20-15DMZ','SMC','Pneumatics',5,1,10,'B-02','']
+  ]);
+  ws['!cols']=[{wch:25},{wch:20},{wch:12},{wch:12},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Template',ws);
+  XLSX.writeFile(wb,'EGM_Import_Template.xlsx');
+}
 
 document.addEventListener('change',function(e){
   if(e.target.id!=='importFile')return;
   const file=e.target.files[0];
   if(!file)return;
+  document.getElementById('importErr').style.display='none';
   const reader=new FileReader();
   reader.onload=function(ev){
     try{
-      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
       const ws=wb.Sheets[wb.SheetNames[0]];
       const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      // ข้าม header row แรก
-      _importData=rows.slice(1).filter(r=>r[0]&&String(r[0]).trim()).map(r=>({
-        name:String(r[0]||'').trim(),
-        model:String(r[1]||'').trim(),
-        cat:String(r[2]||'Other').trim(),
-        qty:parseInt(r[3])||0,
-        min:parseInt(r[4])||0,
-        max:parseInt(r[5])||0,
-        loc:String(r[6]||'').trim(),
-        note:String(r[7]||'').trim(),
-        pn:'',brand:''
-      }));
-      const prev=document.getElementById('importPreview');
-      prev.style.display='block';
-      prev.innerHTML='<div style="color:#4ade80;font-weight:600;margin-bottom:6px">✅ พบ '+_importData.length+' รายการ</div>'
-        +_importData.slice(0,5).map(p=>'<div style="color:#90a4ae;padding:2px 0;border-bottom:1px solid #1f3460">'+p.name+(p.model?' ('+p.model+')':'')+'</div>').join('')
-        +(_importData.length>5?'<div style="color:#546e7a;font-size:.68rem">...และอีก '+(_importData.length-5)+' รายการ</div>':'');
-      document.getElementById('importErr').style.display='none';
+      if(!rows.length){throw new Error('ไฟล์ว่าง');}
+      _importHeaders=rows[0].map(function(h){return String(h).trim();});
+      _importRawRows=rows.slice(1).filter(function(r){return r.some(function(c){return c!=='';});});
+      // auto-map headers
+      document.getElementById('importFileInfo').textContent='พบ '+_importRawRows.length+' แถว | คอลัมน์: '+_importHeaders.join(', ');
+      // สร้าง column mapping UI
+      var mapHtml='';
+      IMPORT_FIELDS.forEach(function(f){
+        var autoIdx=-1;
+        _importHeaders.forEach(function(h,i){
+          var hl=h.toLowerCase();
+          if(f.key==='name'&&(hl.includes('ชื่อ')||hl.includes('name')||hl.includes('part name')))autoIdx=i;
+          if(f.key==='model'&&(hl.includes('model')||hl.includes('รุ่น')))autoIdx=i;
+          if(f.key==='brand'&&(hl.includes('brand')||hl.includes('ยี่ห้อ')||hl.includes('ผู้ผลิต')))autoIdx=i;
+          if(f.key==='cat'&&(hl.includes('หมวด')||hl.includes('cat')||hl.includes('type')))autoIdx=i;
+          if(f.key==='qty'&&(hl.includes('qty')||hl.includes('จำนวน')||hl.includes('คงเหลือ')||hl.includes("q'ty")))autoIdx=i;
+          if(f.key==='min'&&hl.includes('min'))autoIdx=i;
+          if(f.key==='max'&&hl.includes('max'))autoIdx=i;
+          if(f.key==='loc'&&(hl.includes('ตำแหน่ง')||hl.includes('loc')))autoIdx=i;
+          if(f.key==='note'&&(hl.includes('หมาย')||hl.includes('note')||hl.includes('remark')))autoIdx=i;
+        });
+        var opts='<option value="-1">-- ไม่ใช้ --</option>';
+        _importHeaders.forEach(function(h,i){
+          opts+='<option value="'+i+'"'+(autoIdx===i?' selected':'')+'>'+h+'</option>';
+        });
+        mapHtml+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+          +'<label style="font-size:.72rem;color:'+(f.required?'#4ade80':'#90a4ae')+';min-width:110px">'+(f.required?'* ':'')+f.label+'</label>'
+          +'<select class="finput-sm" style="margin:0;flex:1" data-field="'+f.key+'">'+opts+'</select>'
+          +'</div>';
+      });
+      document.getElementById('importColMap').innerHTML=mapHtml;
+      document.getElementById('importStep1').style.display='none';
+      document.getElementById('importStep2').style.display='block';
     }catch(err){
       document.getElementById('importErr').textContent='อ่านไฟล์ไม่ได้: '+err.message;
       document.getElementById('importErr').style.display='block';
@@ -768,65 +808,131 @@ document.addEventListener('change',function(e){
   reader.readAsArrayBuffer(file);
 });
 
-window.doImport=async function(){
-  if(!_importData.length){
-    document.getElementById('importErr').textContent='กรุณาเลือกไฟล์ก่อน';
-    document.getElementById('importErr').style.display='block';
-    return;
+window.importBack=function(){
+  document.getElementById('importStep2').style.display='none';
+  document.getElementById('importStep1').style.display='block';
+}
+window.importBackToMap=function(){
+  document.getElementById('importStep3').style.display='none';
+  document.getElementById('importStep2').style.display='block';
+}
+
+window.importPreview=function(){
+  // อ่าน mapping
+  var map={};
+  document.querySelectorAll('#importColMap select').forEach(function(sel){
+    var idx=parseInt(sel.value);
+    if(idx>=0)map[sel.dataset.field]=idx;
+  });
+  if(map.name===undefined){
+    alert('กรุณาเลือกคอลัมน์ "ชื่ออะไหล่" ก่อน');return;
   }
-  const replace=document.getElementById('importReplace').checked;
+  // แปลงข้อมูล
+  _importMapped=_importRawRows.map(function(r){
+    return {
+      name:String(r[map.name]||'').trim(),
+      model:map.model!==undefined?String(r[map.model]||'').trim():'',
+      brand:map.brand!==undefined?String(r[map.brand]||'').trim():'',
+      cat:map.cat!==undefined?String(r[map.cat]||'').trim():'Other',
+      qty:map.qty!==undefined?(parseInt(r[map.qty])||0):0,
+      min:map.min!==undefined?(parseInt(r[map.min])||0):0,
+      max:map.max!==undefined?(parseInt(r[map.max])||0):0,
+      loc:map.loc!==undefined?String(r[map.loc]||'').trim():'',
+      note:map.note!==undefined?String(r[map.note]||'').trim():'',
+      pn:''
+    };
+  }).filter(function(p){return p.name;});
+
+  // วิเคราะห์ว่าจะ update หรือ insert
+  var toUpdate=[],toInsert=[];
+  _importMapped.forEach(function(p){
+    var existing=p.model?parts.find(function(x){return x.model&&x.model.trim().toLowerCase()===p.model.toLowerCase();}):null;
+    if(existing){p._existingId=existing.id;toUpdate.push(p);}
+    else{toInsert.push(p);}
+  });
+
+  var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+    +'<div style="background:#1b2d4f;border-radius:6px;padding:8px;text-align:center"><div style="font-size:.65rem;color:#90a4ae">อัปเดต</div><div style="font-size:1.4rem;font-weight:800;color:#60a5fa">'+toUpdate.length+'</div></div>'
+    +'<div style="background:#1b2d4f;border-radius:6px;padding:8px;text-align:center"><div style="font-size:.65rem;color:#90a4ae">เพิ่มใหม่</div><div style="font-size:1.4rem;font-weight:800;color:#4ade80">'+toInsert.length+'</div></div>'
+    +'</div>';
+  if(toUpdate.length){
+    html+='<div style="font-size:.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px">จะอัปเดต:</div>';
+    toUpdate.slice(0,5).forEach(function(p){
+      html+='<div style="font-size:.7rem;color:#90a4ae;padding:2px 0;border-bottom:1px solid #1f3460">✏️ '+p.name+(p.model?' ('+p.model+')':'')+'</div>';
+    });
+    if(toUpdate.length>5)html+='<div style="font-size:.68rem;color:#546e7a">...และอีก '+(toUpdate.length-5)+' รายการ</div>';
+  }
+  if(toInsert.length){
+    html+='<div style="font-size:.72rem;color:#4ade80;font-weight:600;margin:8px 0 4px">จะเพิ่มใหม่:</div>';
+    toInsert.slice(0,5).forEach(function(p){
+      html+='<div style="font-size:.7rem;color:#90a4ae;padding:2px 0;border-bottom:1px solid #1f3460">➕ '+p.name+(p.model?' ('+p.model+')':'')+'</div>';
+    });
+    if(toInsert.length>5)html+='<div style="font-size:.68rem;color:#546e7a">...และอีก '+(toInsert.length-5)+' รายการ</div>';
+  }
+  document.getElementById('importPreviewBox').innerHTML=html;
+  document.getElementById('importStep2').style.display='none';
+  document.getElementById('importStep3').style.display='block';
+  document.getElementById('importErr3').style.display='none';
+  document.getElementById('importProgress').style.display='none';
+  document.getElementById('importBtn').disabled=false;
+}
+
+window.doImport=async function(){
   document.getElementById('importBtn').disabled=true;
   document.getElementById('importProgress').style.display='block';
-  document.getElementById('importErr').style.display='none';
-
+  document.getElementById('importErr3').style.display='none';
   try{
-    // ลบของเดิมถ้าเลือก replace
-    if(replace){
-      document.getElementById('importProgressText').textContent='กำลังลบข้อมูลเดิม...';
-      const snap=await db.collection('parts').get();
-      const delBatch=db.batch();
-      snap.docs.forEach(d=>delBatch.delete(d.ref));
-      await delBatch.commit();
-    }
-
-    // Import ทีละ batch 400
-    const BATCH=400;
-    let done=0;
-    for(let i=0;i<_importData.length;i+=BATCH){
-      const chunk=_importData.slice(i,i+BATCH);
-      const batch=db.batch();
-      chunk.forEach(p=>{
-        const ref=db.collection('parts').doc();
-        batch.set(ref,p);
+    var toUpdate=_importMapped.filter(function(p){return p._existingId;});
+    var toInsert=_importMapped.filter(function(p){return !p._existingId;});
+    var done=0,total=toUpdate.length+toInsert.length;
+    // อัปเดตทีละ batch
+    var BATCH=400;
+    for(var i=0;i<toUpdate.length;i+=BATCH){
+      var chunk=toUpdate.slice(i,i+BATCH);
+      var batch=db.batch();
+      chunk.forEach(function(p){
+        var ref=db.collection('parts').doc(p._existingId);
+        var upd={name:p.name,model:p.model,brand:p.brand,cat:p.cat,qty:p.qty,min:p.min,max:p.max,loc:p.loc,note:p.note};
+        batch.update(ref,upd);
       });
       await batch.commit();
       done+=chunk.length;
-      const pct=Math.round(done/_importData.length*100);
-      document.getElementById('importProgressBar').style.width=pct+'%';
-      document.getElementById('importProgressText').textContent='Import แล้ว '+done+'/'+_importData.length+' รายการ';
+      document.getElementById('importProgressBar').style.width=Math.round(done/total*100)+'%';
+      document.getElementById('importProgressText').textContent='อัปเดต '+done+'/'+total;
     }
-
+    // เพิ่มใหม่
+    for(var j=0;j<toInsert.length;j+=BATCH){
+      var chunk2=toInsert.slice(j,j+BATCH);
+      var batch2=db.batch();
+      chunk2.forEach(function(p){
+        var ref2=db.collection('parts').doc();
+        batch2.set(ref2,{name:p.name,model:p.model,brand:p.brand,cat:p.cat,qty:p.qty,min:p.min,max:p.max,loc:p.loc,note:p.note,pn:''});
+      });
+      await batch2.commit();
+      done+=chunk2.length;
+      document.getElementById('importProgressBar').style.width=Math.round(done/total*100)+'%';
+      document.getElementById('importProgressText').textContent='เพิ่มใหม่ '+done+'/'+total;
+    }
     closeModal('modalImport');
     resetImport();
     await loadAll();
     nav('parts',document.querySelector('.sb-link.active'));
-    alert('Import สำเร็จ '+_importData.length+' รายการ!');
+    alert('Import สำเร็จ! อัปเดต '+toUpdate.length+' รายการ, เพิ่มใหม่ '+toInsert.length+' รายการ');
   }catch(err){
-    document.getElementById('importErr').textContent='เกิดข้อผิดพลาด: '+err.message;
-    document.getElementById('importErr').style.display='block';
+    document.getElementById('importErr3').textContent='เกิดข้อผิดพลาด: '+err.message;
+    document.getElementById('importErr3').style.display='block';
     document.getElementById('importBtn').disabled=false;
   }
 }
 
 window.resetImport=function(){
-  _importData=[];
-  document.getElementById('importFile').value='';
-  document.getElementById('importPreview').style.display='none';
-  document.getElementById('importProgress').style.display='none';
-  document.getElementById('importProgressBar').style.width='0%';
-  document.getElementById('importBtn').disabled=false;
+  _importRawRows=[];_importHeaders=[];_importMapped=[];
+  var f=document.getElementById('importFile');if(f)f.value='';
+  document.getElementById('importStep1').style.display='block';
+  document.getElementById('importStep2').style.display='none';
+  document.getElementById('importStep3').style.display='none';
   document.getElementById('importErr').style.display='none';
-  document.getElementById('importReplace').checked=false;
+  var b=document.getElementById('importBtn');if(b)b.disabled=false;
 }
 
 window.filterPartsLive=function(val){
