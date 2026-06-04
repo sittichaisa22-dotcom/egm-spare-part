@@ -643,7 +643,7 @@ function rDash(){
 
   const urgentRows=urgentParts.length>0
     ? urgentParts.map(p=>'<tr>'
-        +'<td><div style="color:#e8f0fe;font-size:.78rem;font-weight:600">'+p.name+'</div>'
+        +'<td><div style="color:#0f172a;font-size:.78rem;font-weight:700">'+p.name+'</div>'
         +(p.model?'<div style="color:#90a4ae;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
         +'<td><span class="badge '+(p.qty===0?'bW':'bP')+'">'+(p.qty===0?'หมด':'ต่ำ')+'</span></td>'
         +'<td style="color:'+(p.qty===0?'#f87171':'#fbbf24')+';font-weight:700">'+p.qty+'</td>'
@@ -701,7 +701,7 @@ function rParts(q){
     const safeId=p.id;
     const searchTxt=((p.name||'')+'|'+(p.pn||'')+'|'+(p.model||'')+'|'+(p.cat||'')).toLowerCase();
     return '<tr '+clickRow+'data-id="'+safeId+'" data-search="'+searchTxt.replace(/"/g,'&quot;')+'">'
-      +'<td><div style="color:#e8f0fe;font-weight:600;font-size:.8rem">'+p.name+'</div>'
+      +'<td><div style="color:#0f172a;font-weight:700;font-size:.8rem">'+p.name+'</div>'
       +(p.model?'<div style="color:#90a4ae;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
       +'<td><span class="badge bA">'+p.cat+'</span></td>'
       +'<td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td>'
