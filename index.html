@@ -1335,23 +1335,26 @@ function rAlerts(){
   const pending=alerts.filter(a=>a.status==='PENDING');
   const ordered=alerts.filter(a=>a.status==='ORDERED');
   const rows=alerts.map(a=>{
+    const p=parts.find(x=>x.pn===a.pn||x.name===a.part)||{};
+    const model=p.model||'';
     const statusBadge=a.status==='ORDERED'
       ?'<span class="badge bA">สั่งซื้อแล้ว</span>'
       :'<span class="badge bP">รอสั่ง</span>';
-    const safePn=a.pn.replace(/'/g,'&#39;');
+    const safePn=(a.pn||'').replace(/'/g,'&#39;');
     const safeId=(a.id||'').replace(/'/g,'&#39;');
     const actionBtn=a.status==='PENDING'
       ?'<button class="btn-sm blue" onclick="doAlt(this.dataset.pn)" data-pn="'+safePn+'"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>'
       :'<button class="btn-sm red" onclick="undoAlt(this.dataset.pn,this.dataset.id)" data-pn="'+safePn+'" data-id="'+safeId+'">ยกเลิก</button>';
     return '<tr>'
-      +'<td><div style="color:#0f172a;font-weight:700;font-size:.78rem">'+a.part+'</div>'
-      +'<div style="font-size:.65rem;color:#546e7a">'+a.pn+'</div></td>'
-      +'<td style="color:#607d8b">'+(a.loc||'—')+'</td>'
-      +'<td style="color:#f87171;font-weight:700">'+a.qty+'</td>'
-      +'<td style="color:#607d8b;font-size:.68rem">'+a.min+'</td>'
-      +'<td style="color:#60a5fa;font-weight:700">'+a.suggest+'</td>'
+      +'<td style="min-width:140px"><div style="color:#0f172a;font-weight:700;font-size:.78rem">'+a.part+'</div>'
+      +(model?'<div style="font-size:.65rem;color:#64748b;margin-top:1px">'+model+'</div>':'')
+      +'</td>'
+      +'<td style="color:#64748b;white-space:nowrap">'+(a.loc||'—')+'</td>'
+      +'<td style="color:#ef4444;font-weight:700">'+a.qty+'</td>'
+      +'<td style="color:#94a3b8;font-size:.72rem">'+a.min+'</td>'
+      +'<td style="color:#667eea;font-weight:700">'+a.suggest+'</td>'
       +'<td>'+statusBadge+'</td>'
-      +'<td>'+actionBtn+'</td>'
+      +'<td style="white-space:nowrap">'+actionBtn+'</td>'
       +'</tr>';
   }).join('');
   const summary='<div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:12px">'
@@ -1361,9 +1364,9 @@ function rAlerts(){
   return '<div id="aT" class="toast success"><i class="ti ti-check"></i> อัปเดตสถานะแล้ว</div>'
     +'<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Reorder Alerts</div>'
     +summary
-    +'<div class="card"><table class="t"><thead><tr><th>อะไหล่</th><th>ตำแหน่ง</th><th>Stock</th><th>Min</th><th>ควรสั่ง</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'
-    +(rows||'<tr><td colspan="7" style="text-align:center;color:#4ade80;padding:20px">✅ Stock ปกติทุกรายการ</td></tr>')
-    +'</tbody></table></div>';
+    +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:560px"><thead><tr><th>ชื่อ / Model</th><th>ตำแหน่ง</th><th>Stock</th><th>Min</th><th>ควรสั่ง</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'
+    +(rows||'<tr><td colspan="7" style="text-align:center;color:#16a34a;padding:20px">✅ Stock ปกติทุกรายการ</td></tr>')
+    +'</tbody></table></div></div>';
 }
 
 window.doAlt=async function(pn){
