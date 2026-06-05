@@ -291,7 +291,7 @@ table.t tr:hover td{background:#f8fafc}
     <div id="importStep3" style="display:none">
       <div id="importPreviewBox" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px;font-size:.75rem;max-height:200px;overflow-y:auto"></div>
       <div id="importProgress" style="display:none;margin-bottom:10px">
-        <div style="font-size:.75rem;color:#90a4ae;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
+        <div style="font-size:.75rem;color:#64748b;margin-bottom:4px" id="importProgressText">กำลัง Import...</div>
         <div style="background:#1f3460;border-radius:4px;height:6px"><div id="importProgressBar" style="background:#2979ff;height:100%;border-radius:4px;width:0%;transition:width .3s"></div></div>
       </div>
       <div class="login-err" id="importErr3"></div>
@@ -337,7 +337,7 @@ table.t tr:hover td{background:#f8fafc}
 <div class="modal-overlay" id="modalResetPw">
   <div class="modal">
     <h3><i class="ti ti-key"></i> Reset Password</h3>
-    <p style="color:#90a4ae;font-size:.8rem;margin-bottom:16px">ตั้ง Password ใหม่ให้ <strong id="resetUserName" style="color:#e8f0fe"></strong></p>
+    <p style="color:#64748b;font-size:.8rem;margin-bottom:16px">ตั้ง Password ใหม่ให้ <strong id="resetUserName" style="color:#0f172a"></strong></p>
     <div class="login-err" id="resetErr"></div>
     <input type="hidden" id="resetUserId">
     <label class="flabel">Password ใหม่</label>
@@ -478,8 +478,8 @@ async function rLoginLog(){
   const loginlogs=snap.docs.map(d=>({id:d.id,...d.data()}));
   const rows=loginlogs.map(l=>'<tr>'
     +'<td style="color:#546e7a;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
-    +'<td style="color:#e8f0fe;font-weight:600">'+(l.displayName||l.username||'—')+'</td>'
-    +'<td style="color:#90a4ae">'+(l.username||'—')+'</td>'
+    +'<td style="color:#0f172a;font-weight:700">'+(l.displayName||l.username||'—')+'</td>'
+    +'<td style="color:#64748b">'+(l.username||'—')+'</td>'
     +'<td><span class="badge '+(l.role==='admin'?'bA':'bR')+'">'+(l.role==='admin'?'Admin':'User')+'</span></td>'
     +'</tr>').join('');
   return '<div style="font-size:.95rem;font-weight:700;margin-bottom:12px">Log การ Login ('+loginlogs.length+' รายการล่าสุด)</div>'
@@ -491,7 +491,7 @@ async function rCategories(){
   const snap=await db.collection('categories').orderBy('name').get();
   categories=snap.docs.map(d=>({id:d.id,...d.data()}));
   const rows=categories.map(c=>'<tr>'
-    +'<td style="color:#e8f0fe;font-weight:600">'+c.name+'</td>'
+    +'<td style="color:#0f172a;font-weight:700">'+c.name+'</td>'
     +'<td style="white-space:nowrap"><button class="btn-sm red" onclick="deleteCat(\''+c.id+'\',\''+c.name+'\')"><i class="ti ti-trash"></i> ลบ</button></td>'
     +'</tr>').join('');
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
@@ -524,7 +524,7 @@ window.doAddCat=async function(){
 async function rUsers(){
   const snap=await db.collection('users').get();
   const users=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const rows=users.map(u=>'<tr><td style="color:#e8f0fe;font-weight:600">'+(u.displayName||'—')+'</td><td style="color:#90a4ae">'+u.username+'</td><td><span class="badge '+(u.role==='admin'?'bA':'bR')+'">'+(u.role==='admin'?'Admin':'User')+'</span></td><td><span class="badge '+(u.disabled?'bW':'bR')+'">'+(u.disabled?'ระงับ':'ใช้งาน')+'</span></td><td style="display:flex;gap:4px;padding:7px 10px">'+(u.id!==currentUser.id?'<button class="btn-sm '+(u.disabled?'green':'red')+'" onclick="toggleUser(\''+u.id+'\','+u.disabled+')">'+( u.disabled?'เปิดใช้':'ระงับ')+'</button><button class="btn-sm red" onclick="deleteUser(\''+u.id+'\',\''+u.username+'\')">ลบ</button>':'<span style="color:#546e7a;font-size:.65rem">— บัญชีตัวเอง —</span>')+'</td></tr>').join('');
+  const rows=users.map(u=>'<tr><td style="color:#0f172a;font-weight:700">'+(u.displayName||'—')+'</td><td style="color:#64748b">'+u.username+'</td><td><span class="badge '+(u.role==='admin'?'bA':'bR')+'">'+(u.role==='admin'?'Admin':'User')+'</span></td><td><span class="badge '+(u.disabled?'bW':'bR')+'">'+(u.disabled?'ระงับ':'ใช้งาน')+'</span></td><td style="display:flex;gap:4px;padding:7px 10px">'+(u.id!==currentUser.id?'<button class="btn-sm '+(u.disabled?'green':'red')+'" onclick="toggleUser(\''+u.id+'\','+u.disabled+')">'+( u.disabled?'เปิดใช้':'ระงับ')+'</button><button class="btn-sm red" onclick="deleteUser(\''+u.id+'\',\''+u.username+'\')">ลบ</button>':'<span style="color:#546e7a;font-size:.65rem">— บัญชีตัวเอง —</span>')+'</td></tr>').join('');
   return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:.95rem;font-weight:700">จัดการ Users ('+users.length+' บัญชี)</div><button class="btn-sm blue" onclick="openModal(\'modalAddUser\')"><i class="ti ti-user-plus"></i> เพิ่ม User</button></div><div class="admin-card"><table class="t"><thead><tr><th>ชื่อ</th><th>Username</th><th>Role</th><th>สถานะ</th><th>ดำเนินการ</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 
@@ -644,7 +644,7 @@ function rDash(){
   const urgentRows=urgentParts.length>0
     ? urgentParts.map(p=>'<tr>'
         +'<td><div style="color:#0f172a;font-size:.78rem;font-weight:700">'+p.name+'</div>'
-        +(p.model?'<div style="color:#90a4ae;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
+        +(p.model?'<div style="color:#64748b;font-size:.65rem">'+p.model+'</div>':'')+'</td>'
         +'<td><span class="badge '+(p.qty===0?'bW':'bP')+'">'+(p.qty===0?'หมด':'ต่ำ')+'</span></td>'
         +'<td style="color:'+(p.qty===0?'#f87171':'#fbbf24')+';font-weight:700">'+p.qty+'</td>'
         +'<td style="color:#607d8b">'+p.min+'</td>'
@@ -662,7 +662,7 @@ function rDash(){
   const lr=logs.length>0
     ? logs.slice(0,6).map(l=>'<div style="padding:10px 12px;border-bottom:1px solid #1f3460;display:flex;justify-content:space-between;align-items:center">'
         +'<div>'
-        +'<div style="color:#e8f0fe;font-size:.78rem;font-weight:600">'+(l.partName||'—')+'</div>'
+        +'<div style="color:#0f172a;font-size:.78rem;font-weight:700">'+(l.partName||'—')+'</div>'
         +'<div style="color:#546e7a;font-size:.65rem">'+ft(l.time)+' · '+(l.user||'—')+'</div>'
         +'</div>'
         +'<div style="text-align:right">'
@@ -682,7 +682,7 @@ function rDash(){
   const topCats=Object.entries(catCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const maxVal=topCats.length?topCats[0][1]:1;
   const chartBars=topCats.map(([cat,cnt])=>'<div style="margin-bottom:10px">'
-    +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px"><span style="color:#90a4ae">'+cat+'</span><span style="color:#f87171;font-weight:700">'+cnt+' รายการ</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px"><span style="color:#64748b">'+cat+'</span><span style="color:#f87171;font-weight:700">'+cnt+' รายการ</span></div>'
     +'<div style="background:#1f3460;border-radius:4px;height:8px"><div style="background:linear-gradient(90deg,#ef4444,#f87171);height:100%;border-radius:4px;width:'+Math.round(cnt/maxVal*100)+'%"></div></div>'
     +'</div>').join('');
   const chartCard=topCats.length
@@ -702,7 +702,7 @@ function rParts(q){
     const searchTxt=((p.name||'')+'|'+(p.pn||'')+'|'+(p.model||'')+'|'+(p.cat||'')).toLowerCase();
     return '<tr '+clickRow+'data-id="'+safeId+'" data-search="'+searchTxt.replace(/"/g,'&quot;')+'">'
       +'<td><div style="color:#0f172a;font-weight:700;font-size:.8rem">'+p.name+'</div>'
-      +(p.model?'<div style="color:#90a4ae;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
+      +(p.model?'<div style="color:#64748b;font-size:.72rem;margin-top:2px">'+p.model+'</div>':'')+'</td>'
       +'<td><span class="badge bA">'+p.cat+'</span></td>'
       +'<td style="color:'+sc(p.qty,p.min)+';font-weight:700">'+p.qty+'</td>'
       
@@ -882,20 +882,20 @@ window.importPreview=function(){
   });
 
   var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
-    +'<div style="background:#1b2d4f;border-radius:6px;padding:8px;text-align:center"><div style="font-size:.65rem;color:#90a4ae">อัปเดต</div><div style="font-size:1.4rem;font-weight:800;color:#60a5fa">'+toUpdate.length+'</div></div>'
-    +'<div style="background:#1b2d4f;border-radius:6px;padding:8px;text-align:center"><div style="font-size:.65rem;color:#90a4ae">เพิ่มใหม่</div><div style="font-size:1.4rem;font-weight:800;color:#4ade80">'+toInsert.length+'</div></div>'
+    +'<div style="background:#1b2d4f;border-radius:6px;padding:8px;text-align:center"><div style="font-size:.65rem;color:#64748b">อัปเดต</div><div style="font-size:1.4rem;font-weight:800;color:#60a5fa">'+toUpdate.length+'</div></div>'
+    +'<div style="background:#1b2d4f;border-radius:6px;padding:8px;text-align:center"><div style="font-size:.65rem;color:#64748b">เพิ่มใหม่</div><div style="font-size:1.4rem;font-weight:800;color:#4ade80">'+toInsert.length+'</div></div>'
     +'</div>';
   if(toUpdate.length){
     html+='<div style="font-size:.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px">จะอัปเดต:</div>';
     toUpdate.slice(0,5).forEach(function(p){
-      html+='<div style="font-size:.7rem;color:#90a4ae;padding:2px 0;border-bottom:1px solid #1f3460">✏️ '+p.name+(p.model?' ('+p.model+')':'')+'</div>';
+      html+='<div style="font-size:.7rem;color:#64748b;padding:2px 0;border-bottom:1px solid #1f3460">✏️ '+p.name+(p.model?' ('+p.model+')':'')+'</div>';
     });
     if(toUpdate.length>5)html+='<div style="font-size:.68rem;color:#546e7a">...และอีก '+(toUpdate.length-5)+' รายการ</div>';
   }
   if(toInsert.length){
     html+='<div style="font-size:.72rem;color:#4ade80;font-weight:600;margin:8px 0 4px">จะเพิ่มใหม่:</div>';
     toInsert.slice(0,5).forEach(function(p){
-      html+='<div style="font-size:.7rem;color:#90a4ae;padding:2px 0;border-bottom:1px solid #1f3460">➕ '+p.name+(p.model?' ('+p.model+')':'')+'</div>';
+      html+='<div style="font-size:.7rem;color:#64748b;padding:2px 0;border-bottom:1px solid #1f3460">➕ '+p.name+(p.model?' ('+p.model+')':'')+'</div>';
     });
     if(toInsert.length>5)html+='<div style="font-size:.68rem;color:#546e7a">...และอีก '+(toInsert.length-5)+' รายการ</div>';
   }
@@ -1010,7 +1010,7 @@ window.viewPart=function(id){
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
   var fields=[['Part Model',p.model||'—'],['Brand',p.brand||'—'],['ตำแหน่ง',p.loc||'—'],['หมายเหตุ',p.note||'—']];
   fields.forEach(function(f){
-    html+='<div style="background:#1f3460;border-radius:6px;padding:8px"><div style="font-size:.62rem;color:#546e7a;margin-bottom:2px">'+f[0]+'</div><div style="font-size:.78rem;color:#e8f0fe;font-weight:600">'+f[1]+'</div></div>';
+    html+='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px"><div style="font-size:.62rem;color:#94a3b8;margin-bottom:2px">'+f[0]+'</div><div style="font-size:.78rem;color:#0f172a;font-weight:700">'+f[1]+'</div></div>';
   });
   html+='</div>';
   if(isAdmin){
@@ -1126,7 +1126,7 @@ function rWith(){
     +'<input class="finput-sm" type="text" id="wSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="wFilter(this.value)">'
     +'</div>'
     +'<select class="finput-sm" id="wP" onchange="wPrev()" style="margin-bottom:10px"><option value="">-- เลือก --</option>'+wOpts+'</select>'
-    +'<div id="wPartInfo" style="display:none;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;color:#90a4ae"></div>'
+    +'<div id="wPartInfo" style="display:none;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;color:#64748b"></div>'
     +'<label class="flabel">จำนวนที่เบิก</label>'
     +'<input class="finput-sm" type="number" id="wQ" min="1" value="1" oninput="wPrev()">'
     +'<label class="flabel">Work Order / Ref.</label>'
@@ -1188,8 +1188,8 @@ window.doW=function(){
   _pendingW={p,n,u,r};
   const aft=p.qty-n;
   document.getElementById('confirmWDetail').innerHTML=
-    '<div style="color:#90a4ae;margin-bottom:8px">รายละเอียดการเบิก</div>'
-    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">อะไหล่</span><span style="color:#e8f0fe;font-weight:600">'+p.name+'</span></div>'
+    '<div style="color:#64748b;margin-bottom:8px">รายละเอียดการเบิก</div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">อะไหล่</span><span style="color:#0f172a;font-weight:700">'+p.name+'</span></div>'
     +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">จำนวนเบิก</span><span style="color:#f87171;font-weight:700">-'+n+' ชิ้น</span></div>'
     +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">Stock หลังเบิก</span><span style="color:'+(aft<=p.min?'#f87171':'#4ade80')+';font-weight:700">'+aft+' ชิ้น</span></div>'
     +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:#607d8b">ผู้เบิก</span><span style="color:#e8f0fe">'+u+'</span></div>'
@@ -1312,7 +1312,7 @@ function rLog(filterUser){
   const r=filtered.map(l=>'<tr>'
     +'<td style="color:#546e7a;font-size:.65rem;white-space:nowrap">'+ft(l.time)+'</td>'
     +'<td style="color:#e8f0fe;font-size:.78rem">'+(l.partName||'—')+'</td>'
-    +'<td style="color:#90a4ae;font-size:.72rem">'+(l.user||'—')+'</td>'
+    +'<td style="color:#64748b;font-size:.72rem">'+(l.user||'—')+'</td>'
     +'<td>'+ba(l.action)+'</td>'
     +'<td style="font-weight:700;color:'+(l.change<0?'#f87171':'#4ade80')+'">'+(l.change>0?'+':'')+l.change+'</td>'
     +'<td style="color:#e8f0fe">'+l.after+'</td>'
@@ -1344,7 +1344,7 @@ function rAlerts(){
       ?'<button class="btn-sm blue" onclick="doAlt(this.dataset.pn)" data-pn="'+safePn+'"><i class="ti ti-check"></i> สั่งซื้อแล้ว</button>'
       :'<button class="btn-sm red" onclick="undoAlt(this.dataset.pn,this.dataset.id)" data-pn="'+safePn+'" data-id="'+safeId+'">ยกเลิก</button>';
     return '<tr>'
-      +'<td><div style="color:#e8f0fe;font-weight:600;font-size:.78rem">'+a.part+'</div>'
+      +'<td><div style="color:#0f172a;font-weight:700;font-size:.78rem">'+a.part+'</div>'
       +'<div style="font-size:.65rem;color:#546e7a">'+a.pn+'</div></td>'
       +'<td style="color:#607d8b">'+(a.loc||'—')+'</td>'
       +'<td style="color:#f87171;font-weight:700">'+a.qty+'</td>'
