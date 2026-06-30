@@ -716,7 +716,7 @@ function rParts(q){
     +'oninput="filterPartsLive(this.value)">'
     +'</div>';
   const countTxt='รายการอะไหล่ทั้งหมด '+parts.length+' รายการ <span id="partCount" style="color:#546e7a;font-size:.75rem"></span>';
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px">'+(isAdmin?'<button class="btn-sm green" onclick="openModal(\'modalImport\')" ><i class="ti ti-file-upload"></i> Import</button>':'')+'<button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-spreadsheet"></i> Excel</button>'+addBtn+'</div></div>'
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:.95rem;font-weight:700">'+countTxt+'</div><div style="display:flex;gap:6px">'+(isAdmin?'<button class="btn-sm green" onclick="openModal(\'modalImport\')" ><i class="ti ti-file-upload"></i> Import</button>':'')+'<button class="btn-sm green" onclick="exportParts()"><i class="ti ti-file-export"></i> Export</button>'+addBtn+'</div></div>'
     +searchBar
     +'<div style="font-size:.7rem;color:#546e7a;margin-bottom:8px"><i class="ti ti-hand-click"></i> กดที่รายการเพื่อดูรายละเอียด</div>'
     +'<div class="card"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="t" style="min-width:360px"><thead><tr><th>ชื่อ / Model</th><th>หมวด</th><th>Qty</th><th>สถานะ</th></tr></thead><tbody id="partsTableBody">'
@@ -741,20 +741,43 @@ window.exportLog=function(){
   const ws=XLSX.utils.aoa_to_sheet(rows);
   ws['!cols']=[{wch:20},{wch:30},{wch:15},{wch:12},{wch:10},{wch:10},{wch:10},{wch:15}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,'Stock Log',ws);
-  XLSX.writeFile(wb,'EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  XLSX.utils.book_append_sheet(wb,ws,'Stock Log');
+  downloadWorkbook(wb,'EGM_Stock_Log_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+// iOS/มือถือ-safe download: เลี่ยง XLSX.writeFile ที่มักไม่ทำงานบน Safari/in-app browser
+function downloadWorkbook(wb,filename){
+  try{
+    const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    const blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=filename;a.rel='noopener';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1500);
+    return true;
+  }catch(e){
+    try{XLSX.writeFile(wb,filename);return true;}catch(e2){alert('ดาวน์โหลดไม่สำเร็จ: '+e2.message);return false;}
+  }
 }
 
 window.exportParts=function(){
   if(!parts.length){alert('ไม่มีข้อมูล');return;}
-  const rows=[['ชื่ออะไหล่','Part Model','หมวดหมู่','Qty','Min','Max','ตำแหน่ง','หมายเหตุ']];
-  parts.forEach(p=>rows.push([p.name,p.model||'',p.cat||'',p.qty,p.min,p.max,p.loc||'',p.note||'']));
+  // เคารพช่องค้นหาที่กำลังพิมพ์อยู่ — export เฉพาะรายการที่ตรงกับคำค้น
+  const sb=document.getElementById('partSearch');
+  const kw=sb?sb.value.toLowerCase().trim():'';
+  const data=kw?parts.filter(p=>(((p.name||'')+'|'+(p.pn||'')+'|'+(p.model||'')+'|'+(p.cat||'')).toLowerCase()).includes(kw)):parts;
+  if(!data.length){alert('ไม่พบรายการที่ตรงกับคำค้น "'+kw+'"');return;}
+  const statTxt=p=>p.qty===0?'หมด Stock':p.qty<=p.min?'Stock ต่ำ':'ปกติ';
+  const rows=[['ชื่ออะไหล่','Part Model','Brand','หมวดหมู่','Qty','Min','Max','สถานะ','ตำแหน่ง','หมายเหตุ']];
+  data.forEach(p=>rows.push([p.name,p.model||'',p.brand||'',p.cat||'',p.qty,p.min,p.max,statTxt(p),p.loc||'',p.note||'']));
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:30},{wch:25},{wch:15},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
+  ws['!cols']=[{wch:30},{wch:22},{wch:12},{wch:14},{wch:7},{wch:7},{wch:7},{wch:12},{wch:12},{wch:20}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,'Parts',ws);
-  XLSX.writeFile(wb,'EGM_Parts_'+new Date().toISOString().slice(0,10)+'.xlsx');
-  return;
+  XLSX.utils.book_append_sheet(wb,ws,'Parts');
+  const tag=kw?'_filtered':'';
+  downloadWorkbook(wb,'EGM_Parts'+tag+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 
@@ -782,8 +805,8 @@ window.downloadTemplate=function(){
   ]);
   ws['!cols']=[{wch:25},{wch:20},{wch:12},{wch:12},{wch:8},{wch:8},{wch:8},{wch:12},{wch:20}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,'Template',ws);
-  XLSX.writeFile(wb,'EGM_Import_Template.xlsx');
+  XLSX.utils.book_append_sheet(wb,ws,'Template');
+  downloadWorkbook(wb,'EGM_Import_Template.xlsx');
 }
 
 document.addEventListener('change',function(e){
