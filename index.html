@@ -104,9 +104,9 @@ table.t tr:hover td{background:#f8fafc}
 
 /* PREVIEW BOX */
 .preview-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px}
-.preview-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #e2e8f0}
+.preview-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:4px 0;border-bottom:1px solid #e2e8f0}
 .preview-row:last-child{border:none}
-.pl{color:#94a3b8;font-size:.75rem}.pv{color:#1e293b;font-weight:600;font-size:.75rem}
+.pl{color:#94a3b8;font-size:.75rem;flex-shrink:0}.pv{color:#1e293b;font-weight:600;font-size:.75rem;text-align:right;word-break:break-word;min-width:0}
 
 /* TOAST */
 .toast{border-radius:8px;padding:10px 14px;font-size:.78rem;margin-bottom:10px;display:none;align-items:center;gap:8px}
@@ -1155,7 +1155,6 @@ window.deletePart=async function(id,name){
 
 function rWith(){
   const defUser=currentUser.displayName||currentUser.username;
-  const wOpts=parts.map(p=>'<option value="'+p.id+'" data-qty="'+p.qty+'" data-min="'+p.min+'" data-name="'+p.name.replace(/"/g,"&quot;")+'">'+p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty+'</option>').join('');
   return '<div style="font-size:.95rem;font-weight:700;margin-bottom:4px">เบิกอะไหล่</div>'
     +'<div style="font-size:.72rem;color:#607d8b;margin-bottom:16px">ตัด Stock อัตโนมัติ</div>'
     +'<div id="wT" class="toast success"><i class="ti ti-check"></i><span id="wM"></span></div>'
@@ -1166,8 +1165,12 @@ function rWith(){
     +'<i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#546e7a"></i>'
     +'<input class="finput-sm" type="text" id="wSearch" placeholder="พิมพ์ชื่อหรือ Model..." style="padding-left:32px;margin-bottom:0" oninput="wFilter(this.value)">'
     +'</div>'
-    +'<select class="finput-sm" id="wP" onchange="wPrev()" style="margin-bottom:10px"><option value="">-- เลือก --</option>'+wOpts+'</select>'
-    +'<div id="wPartInfo" style="display:none;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:8px 12px;font-size:.75rem;margin-bottom:10px;color:#64748b"></div>'
+    +'<input type="hidden" id="wP" value="">'
+    +'<div id="wSelectedBox" style="display:none;background:#0d3d1a;border:1px solid #16a34a;border-radius:6px;padding:8px 12px;margin-bottom:10px;align-items:center;justify-content:space-between">'
+    +'<div><div id="wSelectedName" style="font-size:.8rem;font-weight:700;color:#4ade80"></div><div id="wSelectedSub" style="font-size:.68rem;color:#607d8b;margin-top:2px"></div></div>'
+    +'<button onclick="wClearSelect()" style="background:none;border:none;color:#546e7a;cursor:pointer;font-size:1rem;padding:2px 4px"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +'<div id="wResultList" style="margin-bottom:10px"></div>'
     +'<label class="flabel">จำนวนที่เบิก</label>'
     +'<input class="finput-sm" type="number" id="wQ" min="1" value="1" oninput="wPrev()">'
     +'<label class="flabel">Work Order / Ref.</label>'
@@ -1186,44 +1189,81 @@ function rWith(){
 
 window.wFilter=function(val){
   const kw=val.toLowerCase().trim();
-  const sel=document.getElementById('wP');
-  sel.innerHTML='<option value="">-- เลือก --</option>';
-  const filtered=kw?parts.filter(p=>
+  const list=document.getElementById('wResultList');
+  if(!list)return;
+  if(!kw){list.innerHTML='';return;}
+  const filtered=parts.filter(p=>
     (p.name||'').toLowerCase().includes(kw)||
     (p.model||'').toLowerCase().includes(kw)||
     (p.pn||'').toLowerCase().includes(kw)
-  ):parts;
-  filtered.forEach(p=>{
-    const opt=document.createElement('option');
-    opt.value=p.id;
-    opt.dataset.qty=p.qty;
-    opt.dataset.min=p.min;
-    opt.dataset.name=p.name;
-    opt.textContent=p.name+(p.model?' ('+p.model+')':'')+' — เหลือ '+p.qty;
-    sel.appendChild(opt);
-  });
-  document.getElementById('wPartInfo').style.display='none';
+  ).slice(0,20);
+  if(!filtered.length){
+    list.innerHTML='<div style="text-align:center;padding:14px;color:#546e7a;font-size:.78rem;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px">ไม่พบอะไหล่ที่ค้นหา</div>';
+    return;
+  }
+  list.innerHTML=filtered.map(p=>{
+    const stockColor=p.qty===0?'#f87171':p.qty<=p.min?'#fbbf24':'#4ade80';
+    const stockLabel=p.qty===0?'หมด Stock':p.qty<=p.min?'Stock ต่ำ':'Stock ปกติ';
+    const safeId=p.id.replace(/'/g,"\\'");
+    return '<div onclick="wSelectPart(\'' + safeId + '\')" style="cursor:pointer;background:#0d1b2a;border:1px solid #1f3460;border-radius:6px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.background=\'#1f3460\';" onmouseout="this.style.background=\'#0d1b2a\';">'
+      +'<div>'
+      +'<div style="font-size:.8rem;font-weight:600;color:#e8f0fe">'+p.name+'</div>'
+      +'<div style="font-size:.68rem;color:#607d8b;margin-top:2px">'+(p.model||'')+(p.loc?' · '+p.loc:'')+'</div>'
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0;margin-left:10px">'
+      +'<div style="font-size:.95rem;font-weight:800;color:'+stockColor+'">'+p.qty+'</div>'
+      +'<div style="font-size:.62rem;color:'+stockColor+'">'+stockLabel+'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+window.wSelectPart=function(id){
+  const p=parts.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('wP').value=id;
+  document.getElementById('wSearch').value=p.name+(p.model?' ('+p.model+')':'');
+  document.getElementById('wResultList').innerHTML='';
+  const box=document.getElementById('wSelectedBox');
+  const stockColor=p.qty===0?'#f87171':p.qty<=p.min?'#fbbf24':'#4ade80';
+  document.getElementById('wSelectedName').textContent=p.name+(p.model?' ('+p.model+')':'');
+  document.getElementById('wSelectedSub').innerHTML='Stock คงเหลือ: <span style="color:'+stockColor+';font-weight:700">'+p.qty+'</span> ชิ้น'+(p.loc?' · ตำแหน่ง: '+p.loc:'');
+  box.style.display='flex';
+  wPrev();
+}
+
+window.wClearSelect=function(){
+  document.getElementById('wP').value='';
+  document.getElementById('wSearch').value='';
+  document.getElementById('wResultList').innerHTML='';
+  document.getElementById('wSelectedBox').style.display='none';
   document.getElementById('wPB').style.opacity='.4';
+  document.getElementById('pN').textContent='—';
+  document.getElementById('pO').textContent='—';
+  document.getElementById('pB').textContent='—';
+  document.getElementById('pA').textContent='—';
 }
 
 window.wPrev=function(){
-  const s=document.getElementById('wP'),o=s.options[s.selectedIndex];
-  if(!o.value)return;
-  const q=parseInt(o.dataset.qty),n=parseInt(document.getElementById('wQ').value)||0,a=q-n;
-  document.getElementById('pN').textContent=o.dataset.name;
+  const id=document.getElementById('wP').value;
+  if(!id)return;
+  const p=parts.find(x=>x.id===id);
+  if(!p)return;
+  const q=p.qty,n=parseInt(document.getElementById('wQ').value)||0,a=q-n;
+  document.getElementById('pN').textContent=p.name;
   document.getElementById('pO').textContent='-'+n;
   document.getElementById('pB').textContent=q;
-  const el=document.getElementById('pA');el.textContent=a;el.style.color=a<0?'#dc2626':a<=parseInt(o.dataset.min)?'#f87171':'#4ade80';
+  const el=document.getElementById('pA');el.textContent=a;el.style.color=a<0?'#dc2626':a<=p.min?'#f87171':'#4ade80';
   document.getElementById('wPB').style.opacity='1';
 }
 
 var _pendingW=null;
 window.doW=function(){
-  const s=document.getElementById('wP'),o=s.options[s.selectedIndex];
+  const id=document.getElementById('wP').value;
   document.getElementById('wE').style.display='none';document.getElementById('wT').style.display='none';
-  if(!o.value){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='กรุณาเลือกอะไหล่';return;}
+  if(!id){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='กรุณาเลือกอะไหล่';return;}
   const n=parseInt(document.getElementById('wQ').value)||0,u=document.getElementById('wU').value||currentUser.username,r=document.getElementById('wR').value||'—';
-  const p=parts.find(x=>x.id===o.value);
+  const p=parts.find(x=>x.id===id);
   if(n<=0){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='จำนวนต้องมากกว่า 0';return;}
   if(n>p.qty){document.getElementById('wE').style.display='flex';document.getElementById('wEM').textContent='Stock ไม่พอ — มีแค่ '+p.qty+' ชิ้น';return;}
   _pendingW={p,n,u,r};
@@ -1251,8 +1291,7 @@ window.confirmDoW=async function(){
     await db.collection('alerts').add({partId:p.id,part:p.name,pn:p.pn||'',qty:aft,min:p.min,suggest:p.max-aft,loc:p.loc||'—',status:'PENDING',time:firebase.firestore.FieldValue.serverTimestamp()});
   document.getElementById('wT').style.display='flex';
   document.getElementById('wM').textContent='เบิกสำเร็จ — '+p.name+' -'+n+' ชิ้น (คงเหลือ '+aft+')';
-  document.getElementById('wP').value='';
-  document.getElementById('wPB').style.opacity='.4';
+  wClearSelect();
   await loadAll();
 }
 
