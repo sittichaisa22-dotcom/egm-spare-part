@@ -248,7 +248,7 @@ table.t tr:hover td{background:#f8fafc}
 
 <!-- MODAL: ดูรายละเอียดอะไหล่ -->
 <div class="modal-overlay" id="modalViewPart">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:640px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 id="vpTitle" style="margin:0;font-size:.95rem"></h3>
       <button onclick="closeModal('modalViewPart')" style="background:none;border:none;color:#546e7a;font-size:1.2rem;cursor:pointer"><i class="ti ti-x"></i></button>
@@ -994,28 +994,69 @@ window.deleteFromView=function(btn){
   setTimeout(function(){deletePart(id,name);},200);
 }
 
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 window.viewPart=function(id){
   const p=parts.find(x=>x.id===id);
   if(!p)return;
   const isAdmin=currentUser.role==='admin';
   const statusBadge=p.qty===0?'<span class="badge bW">หมด Stock</span>':p.qty<=p.min?'<span class="badge bP">Stock ต่ำ</span>':'<span class="badge bR">ปกติ</span>';
   const pct=p.max>0?Math.min(100,Math.round(p.qty/p.max*100)):0;
-  const barColor=p.qty===0?'#dc2626':p.qty<=p.min?'#f59e0b':'#22c55e';
+  const qtyColor=p.qty===0?'#fca5a5':p.qty<=p.min?'#fcd34d':'#86efac';
   document.getElementById('vpTitle').textContent=p.name;
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div>'+statusBadge+'</div><div style="font-size:.72rem;color:#546e7a">'+(p.cat||'—')+'</div></div>';
-  html+='<div style="background:#1f3460;border-radius:8px;padding:12px;margin-bottom:12px">';
-  html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.72rem;color:#607d8b">Stock คงเหลือ</span><span style="font-size:1.2rem;font-weight:800;color:'+barColor+'">'+p.qty+'</span></div>';
-  html+='<div style="background:#0d1b2a;border-radius:4px;height:8px;margin-bottom:6px"><div style="background:'+barColor+';height:100%;border-radius:4px;width:'+pct+'%"></div></div>';
-  html+='<div style="display:flex;justify-content:space-between;font-size:.65rem;color:#546e7a"><span>Min: '+p.min+'</span><span>Max: '+p.max+'</span></div></div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
-  var fields=[['Part Model',p.model||'—'],['Brand',p.brand||'—'],['ตำแหน่ง',p.loc||'—'],['หมายเหตุ',p.note||'—']];
+
+  // ---- Header: breadcrumb-style category + status ----
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+  html+='<div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:#94a3b8"><i class="ti ti-package"></i> คลังอะไหล่ <i class="ti ti-chevron-right" style="font-size:.7rem"></i> <span style="color:#475569;font-weight:600">'+esc(p.cat||'ไม่ระบุหมวด')+'</span></div>';
+  html+='<div>'+statusBadge+'</div></div>';
+
+  // ---- Stock hero card (gradient, Stitch-style) ----
+  html+='<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:14px;padding:18px 20px;margin-bottom:12px;box-shadow:0 8px 24px rgba(102,126,234,.25)">';
+  html+='<i class="ti ti-packages" style="position:absolute;right:-10px;bottom:-14px;font-size:7rem;color:rgba(255,255,255,.10);transform:rotate(12deg)"></i>';
+  html+='<div style="position:relative;z-index:1">';
+  html+='<div style="font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:600;margin-bottom:6px">จำนวนคงคลังปัจจุบัน</div>';
+  html+='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:2.8rem;font-weight:800;line-height:1;color:'+qtyColor+'">'+p.qty+'</span><span style="font-size:1rem;color:rgba(255,255,255,.7)">ชิ้น</span></div>';
+  html+='<div style="background:rgba(255,255,255,.18);border-radius:6px;height:7px;margin:12px 0 12px;overflow:hidden"><div style="background:'+qtyColor+';height:100%;border-radius:6px;width:'+pct+'%"></div></div>';
+  html+='<div style="display:flex;gap:8px">';
+  html+='<div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 10px;flex:1"><div style="font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:2px">จุดสั่งซื้อขั้นต่ำ</div><div style="font-weight:700;color:#fff;font-size:.9rem">'+p.min+' ชิ้น</div></div>';
+  html+='<div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 10px;flex:1"><div style="font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:2px">สต็อกสูงสุด</div><div style="font-weight:700;color:#fff;font-size:.9rem">'+p.max+' ชิ้น</div></div>';
+  html+='</div></div></div>';
+
+  // ---- Specs grid (real fields) ----
+  html+='<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:12px">';
+  html+='<div style="font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px"><i class="ti ti-settings"></i> ข้อมูลอะไหล่</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  var fields=[['Part Model',p.model||'—','ti-tag'],['Brand',p.brand||'—','ti-building-factory'],['ตำแหน่งจัดเก็บ',p.loc||'—','ti-map-pin'],['หมายเหตุ',p.note||'—','ti-note']];
   fields.forEach(function(f){
-    html+='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px"><div style="font-size:.62rem;color:#94a3b8;margin-bottom:2px">'+f[0]+'</div><div style="font-size:.78rem;color:#0f172a;font-weight:700">'+f[1]+'</div></div>';
+    html+='<div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:8px 10px"><div style="font-size:.58rem;color:#94a3b8;margin-bottom:3px;display:flex;align-items:center;gap:4px"><i class="ti '+f[2]+'"></i> '+f[0]+'</div><div style="font-size:.78rem;color:#0f172a;font-weight:700;word-break:break-word">'+esc(f[1])+'</div></div>';
   });
+  html+='</div></div>';
+
+  // ---- Last 5 transactions for THIS part (real data from logs) ----
+  var pl=logs.filter(function(l){return l.partId===id;}).slice(0,5);
+  html+='<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:12px">';
+  html+='<div style="padding:10px 14px;border-bottom:1px solid #f1f5f9;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;font-weight:700;display:flex;align-items:center;gap:5px"><i class="ti ti-receipt"></i> ประวัติการทำรายการล่าสุด ('+pl.length+' รายการ)</div>';
+  if(pl.length){
+    html+='<div style="overflow-x:auto"><table class="t" style="min-width:380px"><thead><tr><th>วันที่</th><th>ประเภท</th><th>จำนวน</th><th>Ref.</th><th>ผู้ทำ</th></tr></thead><tbody>';
+    pl.forEach(function(l){
+      var isIn=l.change>0;
+      var actMap={WITHDRAW:['เบิกออก','#dc2626','ti-circle-minus'],RECEIVE:['รับเข้า','#16a34a','ti-circle-plus'],ADJUST:['ปรับสต็อก','#d97706','ti-adjustments']};
+      var a=actMap[l.action]||[l.action,'#2563eb','ti-circle'];
+      html+='<tr><td style="font-size:.7rem;color:#475569">'+ft(l.time)+'</td>';
+      html+='<td><span style="display:inline-flex;align-items:center;gap:4px;color:'+a[1]+';font-weight:600;font-size:.72rem"><i class="ti '+a[2]+'"></i>'+a[0]+'</span></td>';
+      html+='<td style="font-weight:700;color:'+(isIn?'#16a34a':'#dc2626')+'">'+(isIn?'+':'')+l.change+'</td>';
+      html+='<td style="font-size:.7rem;color:#64748b">'+esc(l.ref||'—')+'</td>';
+      html+='<td style="font-size:.72rem;color:#334155">'+esc(l.user||'—')+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }else{
+    html+='<div style="padding:18px;text-align:center;color:#94a3b8;font-size:.74rem">ยังไม่มีประวัติการทำรายการของอะไหล่นี้</div>';
+  }
   html+='</div>';
+
   if(isAdmin){
     html+='<div style="display:flex;gap:8px">';
-    html+='<button class="btn btn-blue" style="margin:0" onclick="editFromView(this)" data-id="'+id+'"><i class="ti ti-edit"></i> แก้ไข</button>';
+    html+='<button class="btn btn-blue" style="margin:0" onclick="editFromView(this)" data-id="'+id+'"><i class="ti ti-edit"></i> แก้ไขข้อมูล</button>';
     html+='<button class="btn btn-red" style="margin:0;flex:0 0 auto;width:auto;padding:8px 16px" onclick="deleteFromView(this)" data-id="'+id+'" data-name="'+p.name.replace(/"/g,'')+'"><i class="ti ti-trash"></i></button>';
     html+='</div>';
   }
